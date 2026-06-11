@@ -1,0 +1,12 @@
+{
+  "ZookeeperQuorum": "",
+  "RedisSentinelConnection": "",
+  "CassandraAddress": "",
+  "EmailTemplateImportLocation": "",
+  "PopupTemplateImportLocation": "",
+  "CassandraAuthenticationEnable": true,
+  "EmailWorkerCount": 1,
+  "HttpWorkerCount": 1,
+  "MongoDBUrl": "",
+  "RedisPingInterval": ""
+}
