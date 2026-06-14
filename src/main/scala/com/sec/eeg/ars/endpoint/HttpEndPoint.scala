@@ -92,6 +92,19 @@ class HttpEndPoint(system:ActorSystem) extends ScalatraServlet with FutureSuppor
     }
   }
 
+  // 하위 호환용 별칭 경로: 과거에 발송된 메일의 스냅샷 링크는 소문자 표기
+  // (/ARS/SnapshotImage/...)로 되어 있다. URL 경로는 대소문자를 구분하므로
+  // 위 SnapShotImage 경로만으로는 옛 링크가 404가 된다. 같은 핸들러로 연결해
+  // 기존 메일과 신규 메일 링크를 모두 처리한다.
+  get("/ARS/SnapshotImage/:eqpid/:crtime") {
+    new AsyncResult() {
+      override val is: Future[_] = {
+        log.info(s"SnapshotImage (legacy alias) request received")
+        system.actorSelection("/user/Master/EmailWorker") ? SnapShotImage(params("eqpid"),params("crtime"))
+      }
+    }
+  }
+
   get("/ARS/History/:hostname/:txn") {
     new AsyncResult() {
       override val is: Future[_] = {
