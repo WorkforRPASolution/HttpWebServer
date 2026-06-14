@@ -558,20 +558,24 @@ class EmailWorker(conf: Config, cassandraConnection: Cluster) extends Actor {
         val subcode = if(conv.subcode == "") "_" else conv.subcode
 
         if (conv.renderedBody.isDefined) {
-          // Option C: RMS pre-rendered the full HTML body + subject. Use them
-          // directly — only @HttpWebServerAddress is substituted (D2). No DB
-          // template lookup, so a missing template row never fails the send.
-          // Recipient routing (getEmailCategory) is unchanged (regression #5).
+          // Option C: RMS가 HTML 본문과 제목을 미리 완성해서 렌더링한 경우다.
+          // 그 값을 그대로 사용하고 @HttpWebServerAddress 토큰만 치환한다.
+          // DB 템플릿을 조회하지 않으므로, 템플릿 행이 없어서 발송이 실패하는 일이 없다.
+          // 수신자 라우팅(getEmailCategory)은 기존과 동일하게 유지된다(regression #5).
           val (emailtitle, retString) = EmailBodyResolver.resolve(
             conv.renderedBody, conv.title, ServiceConfig.ServicePublicAddress, ("", ""))
-          // codeForRedis is only the display token in the Redis message; recipient
-          // routing below uses conv.code directly (identical to the legacy branch).
+          // codeForRedis는 Redis 메시지에 표시되는 코드 문자열일 뿐이다. 아래의 수신자
+          // 라우팅은 conv.code를 직접 사용한다(legacy 분기와 동일).
           val codeForRedis = if (subcode == "_") s"${conv.code}" else s"${conv.code}-${conv.subcode}"
-          val _emailCategory = getEmailCategory(conv.process, conv.model, conv.hostname, conv.code, conv.line)
+          // 수신자 카테고리: emailCategory 직접지정이 있으면 역산(getEmailCategory) 생략.
+          // 제목 헤드라인: displayId(그룹 식별자)가 있으면 hostname 대신 사용.
+          val (_emailCategory, headline) = EmailRoutingResolver.resolve(
+            conv.emailCategory, conv.displayId, conv.hostname,
+            getEmailCategory(conv.process, conv.model, conv.hostname, conv.code, conv.line))
           if (_emailCategory != "") {
             val project = if (conv.app.contains("ARS")) "EARS" else conv.app
-            log.info(s"SendEmail(renderedBody) - ${conv.app},${_emailCategory}: [${project}][${emailtitle}][${conv.hostname}][${codeForRedis}]")
-            context.actorSelection("/user/Master/RedisActor") ! EmailFormat(conv.app, _emailCategory, s"[${project}][${emailtitle}][${conv.hostname}][${codeForRedis}]:${retString}")
+            log.info(s"SendEmail(renderedBody) - ${conv.app},${_emailCategory}: [${project}][${emailtitle}][${headline}][${codeForRedis}]")
+            context.actorSelection("/user/Master/RedisActor") ! EmailFormat(conv.app, _emailCategory, s"[${project}][${emailtitle}][${headline}][${codeForRedis}]:${retString}")
             sender() ! JsonInterfaces.toJson(HttpResponse("Success", ""))
             log.info(s"EmailNotify(renderedBody) - process: ${conv.process}, line: ${conv.line}, model: ${conv.model}, eqpid: ${conv.hostname}, app: ${conv.app}, code: ${conv.code}, subcode: ${conv.subcode}, category: ${category}")
           }
@@ -580,7 +584,7 @@ class EmailWorker(conf: Config, cassandraConnection: Cluster) extends Actor {
           }
         }
         else {
-        // ===== legacy template path — byte-unchanged from the original (pre-Option C) =====
+        // ===== legacy 템플릿 경로 — Option C 도입 전 원본 코드와 한 글자도 다르지 않게 유지 =====
         val emailTemplate = getEmailBody(conv.app, conv.process, conv.model, conv.code, subcode)
         if (emailTemplate != null){
           var retString = emailTemplate._2
@@ -616,12 +620,16 @@ class EmailWorker(conf: Config, cassandraConnection: Cluster) extends Actor {
           retString = retString.replaceAll("@__snapshot__", "")
           retString = retString.replaceAll("@HttpWebServerAddress", s"${ServiceConfig.ServicePublicAddress}")
 
-          var _emailCategory = getEmailCategory(conv.process, conv.model, conv.hostname, conv.code, conv.line)
+          // 공유 계약(EmailHttpDataFormat)이므로 legacy 분기에도 동일 적용:
+          // emailCategory 직접지정 시 역산 생략, displayId 시 헤드라인 분리.
+          val (_emailCategory, headline) = EmailRoutingResolver.resolve(
+            conv.emailCategory, conv.displayId, conv.hostname,
+            getEmailCategory(conv.process, conv.model, conv.hostname, conv.code, conv.line))
 
           if (_emailCategory != "") {
             val project = if (conv.app.contains("ARS")) "EARS" else conv.app
-            log.info(s"SendEmail - ${conv.app},${_emailCategory}: [${project}][${emailtitle}][${conv.hostname}][${code}]")
-            context.actorSelection("/user/Master/RedisActor") ! EmailFormat(conv.app, _emailCategory, s"[${project}][${emailtitle}][${conv.hostname}][${code}]:${retString}")
+            log.info(s"SendEmail - ${conv.app},${_emailCategory}: [${project}][${emailtitle}][${headline}][${code}]")
+            context.actorSelection("/user/Master/RedisActor") ! EmailFormat(conv.app, _emailCategory, s"[${project}][${emailtitle}][${headline}][${code}]:${retString}")
             sender() ! JsonInterfaces.toJson(HttpResponse("Success", ""))
             log.info(s"EmailNotify - process: ${conv.process}, line: ${conv.line}, model: ${conv.model}, eqpid: ${conv.hostname}, app: ${conv.app}, code: ${conv.code}, subcode: ${conv.subcode}, category: ${category}")
           }
