@@ -68,5 +68,28 @@ class EmailHttpDataFormatSpec extends FlatSpec with Matchers {
     // optional fields absent → None, NOT a MappingException (backward compat)
     conv.renderedBody should be(None)
     conv.title should be(None)
+    // group-routing fields also absent → None (same backward-compat guarantee)
+    conv.emailCategory should be(None)
+    conv.displayId should be(None)
+  }
+
+  it should "extract emailCategory and displayId as Some when the payload carries them" in {
+    // Inline payload (not the RMS-owned contract fixture) so this stays
+    // self-contained: a grouped alert supplies both new optional fields.
+    val json = parse(
+      """{
+        |  "hostname": "EQP001", "ip": "10.0.0.99", "app": "ARS",
+        |  "process": "PHOTO", "model": "MODEL-A", "line": "L1",
+        |  "code": "RESOURCE_MONITOR", "subcode": "CPU_CRITICAL",
+        |  "variables": { "Severity": "CRITICAL" },
+        |  "emailCategory": "EMAIL-PHOTO-ALL-TEAM1",
+        |  "displayId": "PHOTO"
+        |}""".stripMargin)
+    val conv = json.extract[EmailHttpDataFormat]
+    conv.emailCategory should be(Some("EMAIL-PHOTO-ALL-TEAM1"))
+    conv.displayId should be(Some("PHOTO"))
+    // unrelated optional fields stay None
+    conv.renderedBody should be(None)
+    conv.title should be(None)
   }
 }
