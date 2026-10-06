@@ -393,7 +393,7 @@ class EmailWorker(conf: Config, cassandraConnection: Cluster) extends Actor {
       }
 
     case CustomFiles(eqpid,year,month,fname) =>
-      val query = s"select body from customfiles where eqpid = '${eqpid}' and years = ${year} and month = ${month} and fname = '${fname}';"
+      val query = s"select body from customfiles where eqpid = '${eqpid}' and year = ${year} and month = ${month} and fname = '${fname}';"
       log.info(s"get CustomFiles: ${eqpid}, ${year}, ${month}, ${fname}")
       var retContents : ByteBuffer = null
       try{

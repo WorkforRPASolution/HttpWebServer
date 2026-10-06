@@ -25,7 +25,7 @@ class HttpWorker(cassandraConnection: Cluster) extends Actor {
   var addCustomFile_ps : PreparedStatement = _
 
   override def preStart() : Unit = {
-    session = cassandraConnection.connect("ears")
+    session = cassandraConnection.connect("ars")
     val query = "insert into historylog(eqpid,txn,step,body) values(?,?,?,?)"
     val add_custom_query = "insert into customfiles(eqpid,year,month,fname,body) values(?,?,?,?,?)"
     addHistory_ps = session.prepare(query)
@@ -47,12 +47,22 @@ class HttpWorker(cassandraConnection: Cluster) extends Actor {
         val conv = data.extract[CustomFilesFormat]
 
         val decoder = new BASE64Decoder
-        val fileExt = conv.fname.substring(conv.fname.lastIndexOf("."),conv.fname.length)
+
+        //conv.fname 이 null 및 확장자가 없을 경우에 대해 대응 코드
+        //val fileExt = conv.fname.substring(conv.fname.lastIndexOf("."),conv.fname.length)
+        val fileNameOrg = Option(conv.fname).getOrElse("")
+        val dotIndex = fileNameOrg.lastIndexOf(".")
+        val fileExt =
+          fileNameOrg.split('.').lastOption match {
+            case Some(ext) if fileNameOrg.contains(".") => "." + ext.toLowerCase
+            case _ => ""
+          }
+
         var fileByte = decoder.decodeBuffer(conv.contents)
         var fileName = conv.fname
         if(fileExt == ".tif" || fileExt == ".tiff"){
           fileByte = ImageUtils.convertTiffBytesToJpegBytes(fileByte)
-          fileName = conv.fname.substring(0, conv.fname.lastIndexOf(".")) + ".jpeg"
+          fileName = fileNameOrg.substring(0, dotIndex) + ".jpeg"
         }
 
         log.info(s"file size: ${fileByte.length}")
