@@ -1,7 +1,8 @@
 # HttpWebServer 골든 마스터 테스트 설계
 
 - 작성일: 2026-10-06
-- 상태: 설계 합의 완료, 문서 검토 대기
+- 상태: 설계 합의 완료. 구현 계획은 `2026-10-06-golden-master-test-plan.md`
+- 갱신 (2026-10-06): 계획을 쓰며 실험으로 확인한 사실을 반영했다. 바뀐 곳은 3장의 KNOWN-ISSUE 7·8과 특이 동작, 4.1·4.2, 5.2, 6장이다.
 - 기준 코드: `email-group-routing`의 `3e5c765`. PR #1 머지분과 Cassandra 키스페이스·컬럼 수정이 들어 있고, 아직 push 전이다.
 - 작업 브랜치: `test/golden-master`. worktree는 `ARS/HttpWebServer-golden`이다.
 - 관련 문서
@@ -69,6 +70,27 @@
 4. 메일 템플릿을 갱신하고 조회하는 키에 `app`이 빠져 있다. 그래서 앱이 달라도 같은 문서를 덮어쓰거나 읽는다.
 5. 복구 메일을 감싸는 템플릿(`RecoveryDefault`)을 액터가 시작할 때 한 번만 읽는다.
 6. 고정 필드(`hostname` 등) 값에 `$`가 있고 템플릿에 그 필드의 토큰이 있으면, 치환 중에 예외가 나서 Fail이 된다. 변수 값은 `quoteReplacement`로 감싸서 괜찮다.
+7. **HTTP 서버가 기동하지 않는다.**
+   - `Master.WebServiceStart`는 Scalatra 부트스트랩을 `"ScalatraBootstrap"`(패키지 없음)으로 등록한다. 그런데 실제 클래스는 `com.sec.eeg.ars.ScalatraBootstrap`이다.
+   - 그래서 Jetty 기동이 `No lifecycle class found!`로 실패하고, `Master.preStart`도 실패한다(2026-10-06 실험).
+   - 운영은 정상 동작하므로, 오늘 고친 `ears`·`years`와 같은 옮겨 적기 오류로 추정한다.
+8. **오류 응답에 내부 정보가 그대로 나간다.**
+   - 숫자 파라미터 오류: 500 본문에 스택 트레이스.
+   - 액터가 10초 안에 응답하지 않을 때: 500 본문에 예외 내용.
+   - 없는 경로: 404 본문에 전체 라우트 목록.
+
+**결함이라고 단정하기 어려운 특이 동작 (표시 없이 그대로 기록한다)**
+- 제목이 대괄호로 겹친다.
+  - 미리 렌더한 본문 경로는 RMS 제목에 이미 `[EARS]`가 있는데 그 앞에 `[EARS]`를 또 붙인다: `[EARS][[EARS] CPU CRITICAL - EQP001]…`. EmailingAgent가 이 문자열을 어떻게 해석하는지는 확인이 필요하다.
+  - `ScriptResult` 제목은 `[[EARS][Script 성공]][제목][장비]스크립트명:`이다.
+- 치환되지 않고 남는 토큰이 있다.
+  - RTM 메일은 `@IP`를 치환하지 않는다.
+  - 복구 메일은 스냅샷이 없으면 `@__snapshot__`을 지우지 않는다.
+- `indext-` 접두사가 붙은 파일은 제목이 `-…`이 된다. `LoadEmailTemplate`는 폴더가 없어도 Success를 돌려준다.
+- 같은 조건의 팝업·이미지 문서가 중복이면 빈 응답이 된다.
+- HTTP 응답 형식
+  - 문자열 응답(HTML 포함)은 `text/plain`, 바이트 응답(이미지 포함)은 `application/octet-stream`으로 나간다.
+  - CORS는 요청한 Origin을 그대로 허용하고 자격 증명도 허용한다. 하지만 사전 요청(OPTIONS)에는 405를 돌려준다.
 
 ## 4. 테스트 구조
 
@@ -79,7 +101,8 @@
 | 골든 | 액터 메시지 14개 | Mongo, Cassandra | 골든 파일 | `mvn test -Pgolden` |
 
 ### 4.1 라우팅 계층
-- `HttpEndPoint(system)`을 내장 Jetty의 임의 포트에 올린다. Jetty는 `jetty-webapp` 9.0.4로 이미 의존성에 있다. 응답이 비동기라서 서블릿은 async 지원을 켜고 등록한다.
+- 운영(`Master.WebServiceStart`)과 같은 구성으로 띄운다. Jetty `WebAppContext`에 `ScalatraListener`를 달고, 실제 `ScalatraBootstrap`이 `Master.system`(테스트가 넣는 전역 값)으로 `HttpEndPoint`를 마운트한다. 포트는 임의로 잡는다.
+- 다른 점은 하나다. 부트스트랩 이름을 패키지까지 적는다(`com.sec.eeg.ars.ScalatraBootstrap`). 운영 값으로는 기동이 실패하기 때문이다(KNOWN-ISSUE 7). 운영 값으로 기동이 실패하는 동작은 별도 테스트로 고정한다.
 - 테스트용 `ActorSystem`의 `/user/Master`에 가짜 `Master`를 띄운다. 그 아래 `HttpWorker`·`EmailWorker` 자리에는 받은 메시지를 기록하고 미리 정한 응답을 돌려주는 가짜 액터를 둔다.
 - HTTP 호출에는 이미 의존성에 있는 Apache HttpClient를 쓴다.
 
@@ -88,6 +111,8 @@
 - Mongo는 `ServiceConfig.database`에 테스트 DB를 넣는 방식으로 연결한다. 이 값은 운영에서도 바깥(`Master`)에서 넣는 전역 변수라서, 운영 코드를 고칠 필요가 없다.
 - Cassandra는 실행할 때마다 테스트 키스페이스 `hws_golden`을 만든다. 만드는 방법은 `ars-schema.cql`의 키스페이스 이름 `ars`를 `hws_golden`으로 바꿔 실행하는 것이다.
   - 액터에 넘기는 `Cluster`는 실제 `Cluster`를 Mockito spy로 감싼 것이다. 이 spy가 `connect("ars")` 호출을 `connect("hws_golden")`으로 돌린다.
+  - spy는 `Mockito.mock(classOf[Cluster], withSettings().spiedInstance(…).defaultAnswer(CALLS_REAL_METHODS))`로 만든다. Mockito 4.11의 `spy`는 Scala 2.11에서 오버로드가 모호해 컴파일되지 않는다.
+  - 케이스 사이에 테이블을 비울 때는 `TRUNCATE`를 쓰지 않고 파티션 단위 `DELETE`를 쓴다. `TRUNCATE`는 공유 컨테이너에 스냅샷을 쌓기 때문이다.
   - 로컬 `ars` 키스페이스는 건드리지 않는다.
 - `EmailWorker` 생성자의 `conf` 인자는 실제로 쓰이지 않으므로 빈 설정을 넘긴다.
 - 케이스 하나는 다음 순서로 실행한다.
@@ -148,8 +173,14 @@ src/test/resources/golden/
 }
 ```
 
-- `body`: POST 본문이다. JSON이 깨진 케이스는 `bodyRaw` 문자열에 넣는다.
+- 본문은 `base`에서 출발한다.
+  - `"rms:legacy"`, `"rms:rendered"`, `"rms:grouped"`는 RMS 계약 파일의 페이로드를 그대로 쓴다.
+  - 그 밖의 이름은 `_fixtures/payloads/<이름>.json`을 쓴다.
+  - 그 위에 `set`(덮어쓸 최상위 필드)과 `unset`(지울 필드)을 적용한다. JSON이 깨진 케이스는 `bodyRaw` 문자열에 넣는다.
 - `params`: GET 계열 메시지의 필드다. 예: `{ "eqpid": "EQP001", "crtime": "1700000000000" }`. 조회 대상 행은 `cassandra`에 고정 시각으로 미리 넣는다.
+- `fixtures`: `_fixtures/<이름>.mongo.json`과 `_fixtures/<이름>.cassandra.json`을 차례로 합친다.
+- `mongoAfterStart`: 액터가 시작한 뒤에 넣을 문서다. 시작할 때 한 번만 읽는 동작(KNOWN-ISSUE 5)을 보이는 데 쓴다.
+- `{"$file": "_files/favicon.png"}`: 어디에 쓰느냐에 따라 다른 값으로 바뀐다. 본문에서는 base64 문자열, Mongo 문서에서는 바이너리, Cassandra 행에서는 `0x…` blob이 된다.
 
 ### 5.3 `expected.txt` (출력)
 
@@ -262,7 +293,7 @@ src/test/resources/golden/
 - 폴더가 없어도 Success를 돌려준다.
 - `app` 없이 덮어쓴다 (KNOWN-ISSUE 4).
 
-규모는 골든 70개 안팎, 라우팅 30개 안팎으로 본다.
+규모는 골든 82개, 라우팅 26개다. 케이스별 `case.json`과 검토 포인트는 구현 계획서가 정본이다.
 
 결함으로 단정하기 어려운 특이 동작은 `knownIssue` 없이 기록만 하고, 고칠지는 나중에 정한다. 해당하는 것은 다음과 같다.
 - `ScriptResult` 제목의 이중 괄호
@@ -313,8 +344,8 @@ src/test/resources/golden/
 
 ## 8. 완료 기준
 
-1. JDK 8에서 `mvn test`가 컨테이너 없이 통과한다. 단위·라우팅 계층과 기존 14개가 대상이다.
-2. JDK 8에서 `mvn test -Pgolden`이 통과한다. `mongodb-44`와 `my-cassandra-server`가 떠 있어야 한다.
+1. JDK 8에서 `mvn test`가 컨테이너 없이 통과한다. 단위·라우팅 계층과 기존 14개를 합쳐 84개다.
+2. JDK 8에서 `mvn test -Pgolden`이 통과한다. 하네스 자체 테스트 9개와 골든 82개를 더해 175개다. `mongodb-44`와 `my-cassandra-server`가 떠 있어야 한다.
 3. 라우트 16개와 메시지 14개가 6장의 케이스 목록대로 모두 덮였다.
 4. 결함을 기록한 골든 파일에는 모두 `# KNOWN-ISSUE` 머리말이 있다. 그 목록은 3장의 결함 번호와 맞아야 한다.
 5. `src/main`이 바뀌지 않았다. 기준 커밋 대비 `git diff 3e5c765 -- src/main`이 비어 있다.
