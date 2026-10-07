@@ -35,7 +35,9 @@ object CassandraGolden {
     }
 
   /**
-   * 테스트 키스페이스 관리 접속. 처음 쓸 때 접속하고, 테스트 키스페이스를 지운 뒤 스키마 파일로 다시 만든다.
+   * 테스트 키스페이스 관리 접속. 처음 쓸 때 접속하고 스키마 파일을 실행한다. 문장이 모두 IF NOT EXISTS 라 있던
+   * 테이블은 그대로 둔다. 키스페이스를 DROP 하지 않는 것은 auto_snapshot 때문에 공유 컨테이너에 스냅샷이 남기 때문이다
+   * (TRUNCATE 를 쓰지 않는 것과 같은 이유). 스키마 파일이 바뀌면 docs/testing.md 의 방법으로 키스페이스를 한 번 지운다.
    * 실패하면 그 Cluster 를 닫고 다음 접근에서 새 Cluster 로 다시 시도한다. 드라이버는 초기화에 실패한 Cluster 를
    * 다시 쓰지 못하게 해서("Can't use this cluster instance …"), 같은 Cluster 를 다시 쓰면 실제 원인이 가려진다.
    */
@@ -47,7 +49,6 @@ object CassandraGolden {
       try {
         val s = connectOrExplain(c, s"$host:$port, 사용자 $user")
         require(Keyspace == "hws_golden", s"테스트 키스페이스 이름이 바뀌었다: $Keyspace")
-        s.execute(s"DROP KEYSPACE IF EXISTS $Keyspace")
         schemaStatements().foreach(stmt => s.execute(stmt))
         current = c
         s
@@ -85,6 +86,11 @@ object CassandraGolden {
     ensureReady()
     cluster.getMetadata.getKeyspace(Keyspace).getTables.asScala.map(_.getName).toSeq.sorted
   }
+
+  /** 테이블 이름 -> 테이블 id. 테이블을 지우고 다시 만들면 id 가 바뀐다 */
+  def tableIds(): Map[String, java.util.UUID] =
+    admin.execute("SELECT table_name, id FROM system_schema.tables WHERE keyspace_name = ?", Keyspace)
+      .all().asScala.map(r => r.getString("table_name") -> r.getUUID("id")).toMap
 
   /** 모든 테이블의 모든 파티션을 지운다. TRUNCATE 는 공유 컨테이너에 스냅샷을 쌓으므로 쓰지 않는다. */
   def clear(): Unit =

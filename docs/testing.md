@@ -34,6 +34,13 @@ mvn test -Pgolden -Dsuites=com.sec.eeg.ars.golden.MailGoldenSpec   # 스위트 �
   - `my-cassandra-server`(9042, 인증 켜짐)
 - 테스트는 전용 Mongo DB `HWS_GOLDEN`과 전용 키스페이스 `hws_golden`만 쓴다. `EARS`와 `ars`는 건드리지 않는다.
 - Cassandra 스키마는 `ARS/docker/cassandra/ars-schema.cql`(운영 DESCRIBE 결과)을 직접 읽어 키스페이스 이름만 바꾼다.
+  - 실행할 때마다 스키마 파일을 실행하지만, 문장이 모두 `IF NOT EXISTS`라 있던 테이블은 그대로 둔다. 케이스 사이에는 파티션 단위 `DELETE`로 비운다.
+  - `DROP`·`TRUNCATE`는 쓰지 않는다. 컨테이너의 `auto_snapshot` 때문에 공유 컨테이너에 스냅샷이 남는다.
+  - 그래서 `ars-schema.cql`이 바뀌면 `hws_golden`을 한 번 직접 지우고 남은 스냅샷도 지운 뒤 다시 돌린다.
+    ```bash
+    docker exec my-cassandra-server cqlsh -u cassandra -p cassandra -e "DROP KEYSPACE IF EXISTS hws_golden"
+    docker exec my-cassandra-server nodetool clearsnapshot -- hws_golden
+    ```
 - `SendEmail`의 기본 페이로드는 `ARS/ResourceMonitorServer/tests/data/akka_email_contract.json`(RMS 계약 파일)을 직접 읽는다.
 - 접속 정보는 환경변수로 바꿀 수 있다.
 
@@ -94,6 +101,7 @@ mvn test -Pgolden -Dsuites=com.sec.eeg.ars.golden.MailGoldenSpec   # 스위트 �
 |---|---|
 | `Mongo 에 접속하지 못했다` | `docker ps`에 `mongodb-44`가 있는지 |
 | `Cassandra 에 접속하지 못했다` | `my-cassandra-server`가 떠 있는지, 인증 설정이 README의 "Cassandra (compose 밖)" 절과 같은지. 컨테이너를 다시 만들면 인증이 꺼진다 |
+| Cassandra 쪽에서 `Undefined column name` 같은 스키마 오류 | `ars-schema.cql`이 바뀌었는데 `hws_golden`이 옛 스키마로 남아 있다. 위 "골든 계층에 필요한 것"의 명령으로 한 번 지운다 |
 | `외부 파일을 찾지 못했다` | worktree가 `ARS/` 바로 아래에 있는지. `../docker`, `../ResourceMonitorServer`를 찾는다 |
 | 지운 테스트가 계속 돈다 | `mvn clean test` |
 | 골든 불일치 | 같은 폴더의 `actual.txt`와 `expected.txt`를 비교한다. 의도한 변경이면 갱신 모드로 기록하고 검토한다 |

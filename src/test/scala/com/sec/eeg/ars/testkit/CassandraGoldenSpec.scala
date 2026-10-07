@@ -27,6 +27,13 @@ class CassandraGoldenSpec extends FunSuite {
     assert(!stmts.exists(_.contains(" ars.")))
   }
 
+  test("새로 접속해 스키마를 맞춰도 테스트 테이블을 지우지 않는다 (DROP 은 공유 컨테이너에 스냅샷을 남긴다)", Golden) {
+    val before = CassandraGolden.tableIds()
+    val fresh = new CassandraGolden.Admin(CassandraGolden.host, CassandraGolden.port, CassandraGolden.user, CassandraGolden.password)
+    try fresh.session finally fresh.close()
+    assert(CassandraGolden.tableIds() == before)
+  }
+
   test("테이블은 운영 ars 와 같은 다섯 개다", Golden) {
     assert(CassandraGolden.tables == Seq("customfiles", "emailsnapshot", "historylog", "snapshot", "snapshotlist"))
   }
