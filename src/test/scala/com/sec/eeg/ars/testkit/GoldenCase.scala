@@ -47,11 +47,23 @@ object GoldenCase {
     found
   }
 
+  /** case.json 에 쓸 수 있는 필드. 오타가 난 필드를 조용히 무시하면 갱신 모드가 잘못된 동작을 그대로 기록한다 */
+  val Fields = Seq("message", "base", "set", "unset", "bodyRaw", "params", "fixtures", "mongo", "mongoAfterStart", "cassandra", "config", "knownIssue")
+
   def load(dir: File): GoldenCase = {
-    val id = dir.getParentFile.getName + "/" + dir.getName
+    val folder = dir.getParentFile.getName
+    val id = folder + "/" + dir.getName
     try {
       val j = read(new File(dir, "case.json"))
+      val unknown = j match {
+        case JObject(fs) => fs.map(_._1).filterNot(Fields.contains)
+        case _ => throw new IllegalArgumentException("case.json 은 객체여야 한다")
+      }
+      if (unknown.nonEmpty)
+        throw new IllegalArgumentException(s"모르는 필드: ${unknown.mkString(", ")} (쓸 수 있는 필드: ${Fields.mkString(", ")})")
       val message = (j \ "message").extractOpt[String].getOrElse(throw new IllegalArgumentException("message 가 없다"))
+      // GoldenSuite 는 폴더 이름으로 테스트를 등록하므로 둘이 다르면 다른 메시지가 기록된다
+      if (message != folder) throw new IllegalArgumentException(s"message($message)가 폴더 이름($folder)과 다르다")
       val fixtures = (j \ "fixtures").extractOpt[List[String]].getOrElse(Nil)
       fixtures.foreach(checkFixture)
       GoldenCase(

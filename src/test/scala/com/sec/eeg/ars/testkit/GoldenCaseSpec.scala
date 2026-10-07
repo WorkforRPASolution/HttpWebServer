@@ -42,6 +42,20 @@ class GoldenCaseSpec extends FunSuite {
     assert(e.getMessage.contains("_fixtures/없는것.mongo.json"))
   }
 
+  test("모르는 필드(오타)는 케이스 이름과 필드 이름을 알려 주며 실패한다") {
+    val e = intercept[IllegalArgumentException](GoldenCase.load(TempCase.dir("SendEmail", "typo",
+      """{"message":"SendEmail","base":"rms:legacy","fixture":["email-base"],"known_issue":"x"}""")))
+    assert(e.getMessage.contains("SendEmail/typo"))
+    assert(e.getMessage.contains("모르는 필드: fixture, known_issue"))
+  }
+
+  test("message 가 폴더 이름과 다르면 실패한다") {
+    val e = intercept[IllegalArgumentException](GoldenCase.load(TempCase.dir("SendEmailForRTM", "copied",
+      """{"message":"SendEmail","base":"rms:legacy"}""")))
+    assert(e.getMessage.contains("SendEmailForRTM/copied"))
+    assert(e.getMessage.contains("폴더 이름(SendEmailForRTM)"))
+  }
+
   test("모르는 message, 빠진 본문·파라미터는 케이스 이름과 함께 실패한다") {
     val unknown = GoldenCase.load(TempCase.dir("Nope", "a", """{"message":"Nope"}"""))
     assert(intercept[IllegalArgumentException](GoldenMessages.build(unknown)).getMessage.contains("Nope/a: 모르는 message"))

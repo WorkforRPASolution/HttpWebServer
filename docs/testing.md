@@ -63,6 +63,7 @@ mvn test -Pgolden -Dsuites=com.sec.eeg.ars.golden.MailGoldenSpec   # 스위트 �
   - `mongoAfterStart`: 액터가 시작한 뒤에 넣을 문서.
   - `config`: `ServicePublicAddress` 등 설정값.
   - `knownIssue`: 결함 설명. `expected.txt` 머리말이 된다.
+  - 이 밖의 필드(오타 포함)가 있거나 `message`가 폴더 이름과 다르면 그 케이스는 실패한다. 오타를 조용히 넘기면 갱신 모드가 잘못된 동작을 기록하기 때문이다.
 - `{"$file": "_files/favicon.png"}`는 어디에 쓰느냐에 따라 바뀐다. 본문에서는 base64, Mongo 문서에서는 바이너리, Cassandra 행에서는 blob이 된다.
 - 템플릿 가져오기 케이스의 입력 폴더는 케이스 폴더의 `files/email/…`, `files/popup/…`에 둔다.
 - 새 케이스를 추가하는 순서
