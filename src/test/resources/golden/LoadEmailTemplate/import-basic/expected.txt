@@ -1,0 +1,18 @@
+# case: LoadEmailTemplate/import-basic
+== reply ==
+{"result":"Success","message":""}
+== redis ==
+(변경 없음)
+== mongo ==
+EMAIL_IMAGE_REPOSITORY
+  - {"body":"<286 bytes sha256:99d69510d1da>","name":"old.png","prefix":"ARS_PHOTO_MODEL-A_RM_CPU__"}
+  + {"body":"<286 bytes sha256:99d69510d1da>","name":"logo.png","prefix":"ARS_PHOTO_MODEL-A_RM_CPU__"}
+EMAIL_TEMPLATE_REPOSITORY
+  + {"code":"RM_CPU","html":"<p><img src=\"http://@HttpWebServerAddress/ARS/EmailImage/ARS_PHOTO_MODEL-A_RM_CPU__/logo.png\"> host=@Hostname</p>","model":"MODEL-A","process":"PHOTO","subcode":"_","title":"CPU-Alert"}
+== cassandra ==
+(변경 없음)
+== files ==
+- email/ARS^PHOTO^MODEL-A^RM_CPU/CPU-Alert.html
+- email/ARS^PHOTO^MODEL-A^RM_CPU/logo.png
++ email/_workdone/ARS^PHOTO^MODEL-A^RM_CPU/CPU-Alert.html
++ email/_workdone/ARS^PHOTO^MODEL-A^RM_CPU/logo.png

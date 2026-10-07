@@ -1,0 +1,14 @@
+# case: LoadEmailTemplate/import-replace-workdone
+== reply ==
+{"result":"Success","message":""}
+== redis ==
+(변경 없음)
+== mongo ==
+EMAIL_TEMPLATE_REPOSITORY
+  + {"code":"RM_CPU","html":"<p>new</p>","model":"MODEL-A","process":"PHOTO","subcode":"_","title":"New"}
+== cassandra ==
+(변경 없음)
+== files ==
+- email/ARS^PHOTO^MODEL-A^RM_CPU/New.html
+- email/_workdone/ARS^PHOTO^MODEL-A^RM_CPU/Old.html
++ email/_workdone/ARS^PHOTO^MODEL-A^RM_CPU/New.html

@@ -1,0 +1,13 @@
+# case: LoadEmailTemplate/import-subcode
+== reply ==
+{"result":"Success","message":""}
+== redis ==
+(변경 없음)
+== mongo ==
+EMAIL_TEMPLATE_REPOSITORY
+  + {"code":"RM_CPU","html":"<p>critical @Hostname</p>","model":"MODEL-A","process":"PHOTO","subcode":"CRITICAL","title":"Alert"}
+== cassandra ==
+(변경 없음)
+== files ==
+- email/ARS^PHOTO^MODEL-A^RM_CPU^CRITICAL/Alert.html
++ email/_workdone/ARS^PHOTO^MODEL-A^RM_CPU^CRITICAL/Alert.html

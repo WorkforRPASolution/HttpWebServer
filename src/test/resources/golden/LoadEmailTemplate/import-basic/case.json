@@ -1,0 +1,1 @@
+{"message":"LoadEmailTemplate","mongo":{"EMAIL_IMAGE_REPOSITORY":[{"prefix":"ARS_PHOTO_MODEL-A_RM_CPU__","name":"old.png","body":{"$file":"_files/favicon.png"}}]}}

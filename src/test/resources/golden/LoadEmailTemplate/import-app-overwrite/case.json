@@ -1,0 +1,1 @@
+{"message":"LoadEmailTemplate","mongo":{"EMAIL_TEMPLATE_REPOSITORY":[{"process":"PHOTO","model":"MODEL-A","code":"RM_CPU","subcode":"_","title":"ARS 기존","html":"<p>ARS</p>"}]},"knownIssue":"KNOWN-ISSUE 4: 갱신 키(process, model, code, subcode)에 app 이 없어 다른 앱 템플릿을 덮어쓴다"}
