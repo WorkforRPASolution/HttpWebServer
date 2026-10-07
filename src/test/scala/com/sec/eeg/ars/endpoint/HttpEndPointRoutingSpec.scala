@@ -109,6 +109,9 @@ class HttpEndPointRoutingSpec extends FunSuite with BeforeAndAfterAll with Befor
     val files = h.get("/ARS/Customfiles/EQP001/2026/x/report.txt")
     assert(files.status == 500)
     assert(files.text.startsWith("java.lang.NumberFormatException: For input string: \"x\""))
+    val year = h.get("/ARS/Customfiles/EQP001/yy/07/report.txt")
+    assert(year.status == 500)
+    assert(year.text.startsWith("java.lang.NumberFormatException: For input string: \"yy\""))
     h.httpProbe.expectNoMsg(300.millis)
     h.emailProbe.expectNoMsg(300.millis)
   }
