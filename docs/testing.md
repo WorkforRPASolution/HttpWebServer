@@ -9,8 +9,8 @@
 
 ```bash
 export JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-8.jdk/Contents/Home   # JDK 8 전용
-mvn test                                    # 단위·라우팅 계층 84개. 컨테이너 불필요, mvn package 도 이것만 돈다
-mvn test -Pgolden                           # 골든 계층까지 175개 (약 1분 30초)
+mvn test                                    # 단위·라우팅 계층 87개. 컨테이너 불필요, mvn package 도 이것만 돈다
+mvn test -Pgolden                           # 골든 계층까지 179개 (약 1분 30초)
 mvn test -Pgolden -Dgolden.update=true      # 골든 파일 기록·갱신 → 반드시 git diff 로 검토
 mvn test -Pgolden -Dsuites=com.sec.eeg.ars.golden.MailGoldenSpec   # 스위트 하나만
 ```
