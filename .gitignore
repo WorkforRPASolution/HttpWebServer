@@ -37,3 +37,6 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+### 골든 마스터: 불일치 시 남는 실제 출력 ###
+src/test/resources/golden/**/actual.*

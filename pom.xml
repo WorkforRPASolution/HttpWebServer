@@ -24,6 +24,10 @@
     <encoding>UTF-8</encoding>
     <scala.version>2.11.8</scala.version>
     <scala.compat.version>2.11</scala.compat.version>
+    <!-- Golden 태그 테스트는 기본 실행에서 뺀다. -Pgolden 이 이 값을 none 으로 바꾼다 -->
+    <hws.tagsToExclude>com.sec.eeg.ars.testkit.Golden</hws.tagsToExclude>
+    <!-- 골든 파일 갱신 모드: -Dgolden.update=true -->
+    <golden.update>false</golden.update>
   </properties>
 
   <repositories>
@@ -314,6 +318,13 @@
         </exclusion>
       </exclusions>
     </dependency>
+    <!-- 골든 하네스: 운영 코드의 connect("ars") 를 테스트 키스페이스로 돌리는 Cluster spy -->
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>4.11.0</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -414,6 +425,10 @@
           <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
           <junitxml>.</junitxml>
           <filereports>WDF TestSuite.txt</filereports>
+          <tagsToExclude>${hws.tagsToExclude}</tagsToExclude>
+          <systemProperties>
+            <golden.update>${golden.update}</golden.update>
+          </systemProperties>
         </configuration>
         <executions>
           <execution>
@@ -426,4 +441,13 @@
       </plugin>
     </plugins>
   </build>
+  <profiles>
+    <!-- OrbStack 의 mongodb-44·my-cassandra-server 가 필요한 골든 테스트까지 돌린다 -->
+    <profile>
+      <id>golden</id>
+      <properties>
+        <hws.tagsToExclude>none</hws.tagsToExclude>
+      </properties>
+    </profile>
+  </profiles>
 </project>
