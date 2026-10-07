@@ -34,16 +34,41 @@ object CassandraGolden {
           "인증 설정이 ARS/docker/README.md 의 'Cassandra (compose 밖)' 절과 같은지 확인한다. 원인: " + e.getMessage, e)
     }
 
-  private lazy val cluster: Cluster = openCluster(host, port, user, password)
+  /**
+   * 테스트 키스페이스 관리 접속. 처음 쓸 때 접속하고, 테스트 키스페이스를 지운 뒤 스키마 파일로 다시 만든다.
+   * 실패하면 그 Cluster 를 닫고 다음 접근에서 새 Cluster 로 다시 시도한다. 드라이버는 초기화에 실패한 Cluster 를
+   * 다시 쓰지 못하게 해서("Can't use this cluster instance …"), 같은 Cluster 를 다시 쓰면 실제 원인이 가려진다.
+   */
+  final class Admin(host: String, port: Int, user: String, password: String) {
+    @volatile private var current: Cluster = _
 
-  /** JVM 당 한 번: 테스트 키스페이스를 지우고 스키마 파일로 다시 만든다 */
-  private lazy val admin: Session = {
-    val s = connectOrExplain(cluster, s"$host:$port, 사용자 $user")
-    require(Keyspace == "hws_golden", s"테스트 키스페이스 이름이 바뀌었다: $Keyspace")
-    s.execute(s"DROP KEYSPACE IF EXISTS $Keyspace")
-    schemaStatements().foreach(stmt => s.execute(stmt))
-    s
+    lazy val session: Session = {
+      val c = openCluster(host, port, user, password)
+      try {
+        val s = connectOrExplain(c, s"$host:$port, 사용자 $user")
+        require(Keyspace == "hws_golden", s"테스트 키스페이스 이름이 바뀌었다: $Keyspace")
+        s.execute(s"DROP KEYSPACE IF EXISTS $Keyspace")
+        schemaStatements().foreach(stmt => s.execute(stmt))
+        current = c
+        s
+      } catch {
+        case e: Throwable =>
+          c.close()
+          throw e
+      }
+    }
+
+    def cluster: Cluster = { session; current }
+
+    def close(): Unit = if (current != null) current.close()
   }
+
+  /** JVM 당 하나 */
+  private lazy val keyspaceAdmin = new Admin(host, port, user, password)
+
+  private def admin: Session = keyspaceAdmin.session
+
+  private def cluster: Cluster = keyspaceAdmin.cluster
 
   def ensureReady(): Unit = admin
 

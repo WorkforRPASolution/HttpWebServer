@@ -11,6 +11,15 @@ class CassandraGoldenSpec extends FunSuite {
     } finally c.close()
   }
 
+  test("접속에 실패한 뒤 다시 시도해도 실제 원인을 알려 준다") {
+    val a = new CassandraGolden.Admin("127.0.0.1", 1, "u", "p")
+    try {
+      intercept[IllegalStateException](a.session)
+      val again = intercept[IllegalStateException](a.session)
+      assert(again.getMessage.contains("Cannot connect"), again.getMessage)
+    } finally a.close()
+  }
+
   test("스키마 파일의 키스페이스 이름만 hws_golden 으로 바꾼다") {
     val stmts = CassandraGolden.schemaStatements()
     assert(stmts.head.startsWith("CREATE KEYSPACE IF NOT EXISTS hws_golden"))
