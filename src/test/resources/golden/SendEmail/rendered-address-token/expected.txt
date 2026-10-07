@@ -1,0 +1,12 @@
+# case: SendEmail/rendered-address-token
+== reply ==
+{"result":"Success","message":""}
+== redis ==
+EmailFormat(project=ARS, category=EMAIL-TEST-EXACT)
+[EARS][[EARS] CPU CRITICAL - EQP001][EQP001][RESOURCE_MONITOR-CPU_CRITICAL]:<p>link=http://hws.golden:8080/d raw=&#64;HttpWebServerAddress host=@Hostname</p>
+== mongo ==
+(변경 없음)
+== cassandra ==
+(변경 없음)
+== files ==
+(변경 없음)

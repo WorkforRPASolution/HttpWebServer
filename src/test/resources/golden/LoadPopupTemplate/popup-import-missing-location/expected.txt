@@ -1,0 +1,11 @@
+# case: LoadPopupTemplate/popup-import-missing-location
+== reply ==
+{"result":"Failed","message":"There is no directory: missing-dir"}
+== redis ==
+(변경 없음)
+== mongo ==
+(변경 없음)
+== cassandra ==
+(변경 없음)
+== files ==
+(변경 없음)

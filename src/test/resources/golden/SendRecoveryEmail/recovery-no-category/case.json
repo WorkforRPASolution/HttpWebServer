@@ -1,0 +1,1 @@
+{"message":"SendRecoveryEmail","base":"recovery","set":{"hostname":"EQP999","scname":"SC_UNKNOWN"},"fixtures":["email-base","recovery-wrapper"]}

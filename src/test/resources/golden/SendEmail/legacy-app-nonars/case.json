@@ -1,0 +1,1 @@
+{"message":"SendEmail","base":"rms:legacy","set":{"app":"RMS"},"fixtures":["email-base"],"knownIssue":"KNOWN-ISSUE 4: 템플릿 조회 키에 app 이 없어 다른 앱도 같은 템플릿을 쓴다"}

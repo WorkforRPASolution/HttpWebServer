@@ -1,0 +1,1 @@
+{"message":"SendEmail","base":"rms:rendered","set":{"renderedBody":"<p>link=http://@HttpWebServerAddress/d raw=&#64;HttpWebServerAddress host=@Hostname</p>"},"fixtures":["email-base"]}

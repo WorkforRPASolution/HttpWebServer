@@ -1,0 +1,12 @@
+# case: SendEmail/rendered-subcode-empty
+== reply ==
+{"result":"Success","message":""}
+== redis ==
+EmailFormat(project=ARS, category=EMAIL-TEST-EXACT)
+[EARS][[EARS] CPU CRITICAL - EQP001][EQP001][RESOURCE_MONITOR]:<h3>[CPU] CRITICAL 임계 초과</h3><table border="1"><tr><th>장비</th><th>현재값</th></tr><tr><td>EQP001</td><td>96.5</td></tr></table>
+== mongo ==
+(변경 없음)
+== cassandra ==
+(변경 없음)
+== files ==
+(변경 없음)

@@ -1,0 +1,1 @@
+{"message":"SendEmail","base":"rms:legacy","set":{"subcode":"MEM_WARN"},"fixtures":["email-base"]}

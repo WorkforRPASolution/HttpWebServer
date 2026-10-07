@@ -1,0 +1,15 @@
+# case: LoadEmailTemplate/import-app-overwrite
+# KNOWN-ISSUE: KNOWN-ISSUE 4: 갱신 키(process, model, code, subcode)에 app 이 없어 다른 앱 템플릿을 덮어쓴다
+== reply ==
+{"result":"Success","message":""}
+== redis ==
+(변경 없음)
+== mongo ==
+EMAIL_TEMPLATE_REPOSITORY
+  - {"code":"RM_CPU","html":"<p>ARS</p>","model":"MODEL-A","process":"PHOTO","subcode":"_","title":"ARS 기존"}
+  + {"code":"RM_CPU","html":"<p>RMS</p>","model":"MODEL-A","process":"PHOTO","subcode":"_","title":"RMS-New"}
+== cassandra ==
+(변경 없음)
+== files ==
+- email/RMS^PHOTO^MODEL-A^RM_CPU/RMS-New.html
++ email/_workdone/RMS^PHOTO^MODEL-A^RM_CPU/RMS-New.html

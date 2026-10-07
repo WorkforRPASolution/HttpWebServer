@@ -1,0 +1,12 @@
+# case: SendEmail/rendered-grouped
+== reply ==
+{"result":"Success","message":""}
+== redis ==
+EmailFormat(project=ARS, category=EMAIL-PHOTO-ALL-TEAM1)
+[EARS][[EARS] CPU CRITICAL - PHOTO][PHOTO][RESOURCE_MONITOR-CPU_CRITICAL]:<h3>[CPU] CRITICAL 임계 초과</h3><table border="1"><tr><th>장비</th><th>현재값</th></tr><tr><td>EQP001</td><td>96.5</td></tr><tr><td>EQP050</td><td>97.1</td></tr></table>
+== mongo ==
+(변경 없음)
+== cassandra ==
+(변경 없음)
+== files ==
+(변경 없음)

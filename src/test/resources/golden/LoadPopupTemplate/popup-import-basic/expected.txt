@@ -1,0 +1,17 @@
+# case: LoadPopupTemplate/popup-import-basic
+== reply ==
+{"result":"Success","message":""}
+== redis ==
+(변경 없음)
+== mongo ==
+EMAIL_IMAGE_REPOSITORY
+  + {"body":"<286 bytes sha256:99d69510d1da>","name":"pic.png","prefix":"popup_PHOTO_MODEL-A_RM_CPU"}
+POPUP_TEMPLATE_REPOSITORY
+  + {"code":"RM_CPU","html":"<div><img src=\"http://@HttpWebServerAddress/ARS/EmailImage/popup_PHOTO_MODEL-A_RM_CPU/pic.png\"> 팝업</div>","model":"MODEL-A","process":"PHOTO"}
+== cassandra ==
+(변경 없음)
+== files ==
+- popup/PHOTO^MODEL-A^RM_CPU/index.html
+- popup/PHOTO^MODEL-A^RM_CPU/pic.png
++ popup/_workdone/PHOTO^MODEL-A^RM_CPU/index.html
++ popup/_workdone/PHOTO^MODEL-A^RM_CPU/pic.png

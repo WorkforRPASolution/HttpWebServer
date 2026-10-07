@@ -1,0 +1,13 @@
+# case: SendRecoveryEmail/recovery-snapshot
+== reply ==
+{"result":"Success","message":""}
+== redis ==
+EmailFormat(project=ARS, category=EMAIL-TEST-SCRIPT)
+[EARS][복구] EQP001 SC_RESTART:<div class="wrap"><b>복구 완료</b> 결과=OK</div><p>proc=PHOTO model=MODEL-A eqp=EQP001 line=1라인 sdwt=SDWT-A snap=http://hws.golden:8080/ARS/SnapShotImage/EQP001/<T1></p>
+== mongo ==
+(변경 없음)
+== cassandra ==
+emailsnapshot
+  + {"body":"<286 bytes sha256:99d69510d1da>","eqpid":"EQP001","timestamp":<T1>}
+== files ==
+(변경 없음)

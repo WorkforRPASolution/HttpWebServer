@@ -1,0 +1,1 @@
+{"message":"QueryHistory","params":{"eqpid":"EQP001","txn":"7"},"cassandra":{"historylog":[{"eqpid":"EQP001","txn":7,"step":1,"body":"<script>alert(1)</script>"}]},"knownIssue":"KNOWN-ISSUE 3: 이력 HTML 을 이스케이프하지 않고 저장·출력한다"}

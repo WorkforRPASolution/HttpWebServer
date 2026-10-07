@@ -1,0 +1,1 @@
+{"message":"SendEmail","base":"rms:legacy","set":{"variables":{"Severity":"$100 \\1 원"}},"fixtures":["email-base"]}

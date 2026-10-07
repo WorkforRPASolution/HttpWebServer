@@ -1,0 +1,1 @@
+{"message":"QueryHistory","params":{"eqpid":"EQP001","txn":"7"},"cassandra":{"historylog":[{"eqpid":"EQP001","txn":7,"step":2,"body":"<b>2단계</b>"},{"eqpid":"EQP001","txn":7,"step":1,"body":"<b>1단계</b>"}]}}

@@ -1,0 +1,11 @@
+# case: QueryHistory/query-history-empty
+== reply ==
+ActionResult(status=500, body=There is no data)
+== redis ==
+(변경 없음)
+== mongo ==
+(변경 없음)
+== cassandra ==
+(변경 없음)
+== files ==
+(변경 없음)

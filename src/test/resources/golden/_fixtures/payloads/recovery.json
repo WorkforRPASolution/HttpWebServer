@@ -1,0 +1,1 @@
+{"hostname": "EQP001", "process": "PHOTO", "line": "L1", "model": "MODEL-A", "scname": "SC_RESTART", "title": "[EARS][복구] EQP001 SC_RESTART", "body": "<b>복구 완료</b> 결과=@Result", "variables": {"Result": "OK"}}

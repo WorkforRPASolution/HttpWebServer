@@ -1,0 +1,11 @@
+# case: PopupContent/found
+== reply ==
+<div>팝업 RM_CPU</div>
+== redis ==
+(변경 없음)
+== mongo ==
+(변경 없음)
+== cassandra ==
+(변경 없음)
+== files ==
+(변경 없음)

@@ -1,0 +1,12 @@
+# case: ScriptResult/script-property-missing-key
+== reply ==
+{"result":"Success","message":""}
+== redis ==
+EmailFormat(project=ARS, category=EMAIL-TEST-SCRIPT)
+[[EARS][Script 성공]][재시작 스크립트][EQP001]SC_RESTART:<p>[script] host=EQP001 ip=10.0.0.99 line=1라인 code=SC_RESTART out=재시작 완료</p>
+== mongo ==
+(변경 없음)
+== cassandra ==
+(변경 없음)
+== files ==
+(변경 없음)

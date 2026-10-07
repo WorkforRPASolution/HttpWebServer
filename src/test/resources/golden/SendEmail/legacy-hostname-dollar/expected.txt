@@ -1,0 +1,12 @@
+# case: SendEmail/legacy-hostname-dollar
+# KNOWN-ISSUE: KNOWN-ISSUE 6: hostname 의 $ 를 정규식 그룹 참조로 해석해 치환 중 예외가 난다
+== reply ==
+{"result":"Fail","message":"No group 1"}
+== redis ==
+(변경 없음)
+== mongo ==
+(변경 없음)
+== cassandra ==
+(변경 없음)
+== files ==
+(변경 없음)

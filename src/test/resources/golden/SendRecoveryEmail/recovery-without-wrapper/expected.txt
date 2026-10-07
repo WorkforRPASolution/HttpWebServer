@@ -1,0 +1,12 @@
+# case: SendRecoveryEmail/recovery-without-wrapper
+== reply ==
+{"result":"Success","message":""}
+== redis ==
+EmailFormat(project=ARS, category=EMAIL-TEST-SCRIPT)
+[EARS][복구] EQP001 SC_RESTART:<b>복구 완료</b> 결과=OK
+== mongo ==
+(변경 없음)
+== cassandra ==
+(변경 없음)
+== files ==
+(변경 없음)

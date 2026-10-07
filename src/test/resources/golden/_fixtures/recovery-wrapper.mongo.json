@@ -1,0 +1,6 @@
+{
+  "EMAIL_TEMPLATE_REPOSITORY": [
+    {"process": "all", "model": "all", "code": "RecoveryDefault", "subcode": "_", "title": "복구 래퍼",
+     "html": "<div class=\"wrap\">@contents</div><p>proc=@Process model=@Model eqp=@Eqpid line=@Line sdwt=@Sdwt snap=@__snapshot__</p>"}
+  ]
+}

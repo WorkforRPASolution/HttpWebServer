@@ -1,0 +1,13 @@
+# case: LoadPopupTemplate/popup-import-bom
+== reply ==
+{"result":"Success","message":""}
+== redis ==
+(변경 없음)
+== mongo ==
+POPUP_TEMPLATE_REPOSITORY
+  + {"code":"RM_BOM","html":"<div>BOM 제거</div>","model":"MODEL-A","process":"PHOTO"}
+== cassandra ==
+(변경 없음)
+== files ==
+- popup/PHOTO^MODEL-A^RM_BOM/index.html
++ popup/_workdone/PHOTO^MODEL-A^RM_BOM/index.html

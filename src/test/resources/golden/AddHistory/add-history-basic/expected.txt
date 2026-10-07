@@ -1,0 +1,12 @@
+# case: AddHistory/add-history-basic
+== reply ==
+{"result":"Success","message":""}
+== redis ==
+(변경 없음)
+== mongo ==
+(변경 없음)
+== cassandra ==
+historylog
+  + {"body":"<table bgColor=#308cfc><tbody><tr><th><strong>1.1단계 확인</strong><img width=\"15\" height=\"15\" src=\"data:Image/png;base64,UkVG\" class=\"magnify\" border=\"2\" data-magnifyto=\"150\" data-magnifyby=\"100\" /></th></tr><tr><td bgColor=white height=100 align=center><img src=\"data:Image/png;base64,SU1BR0U=\" class=\"magnify\" border=\"2\" width=\"150\" max-height=\"100\" data-magnifyto=\"300\" data-magnifyby=\"200\" /></td></tr></tbody></table><br>","eqpid":"EQP001","step":1,"txn":1700000000001}
+== files ==
+(변경 없음)

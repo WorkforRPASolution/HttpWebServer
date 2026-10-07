@@ -1,0 +1,1 @@
+{"message":"SendEmail","base":"rms:legacy","set":{"variables":{"Severity":"CRITICAL","__snapshot__":{"$file":"_files/favicon.png"}}},"fixtures":["email-base"]}

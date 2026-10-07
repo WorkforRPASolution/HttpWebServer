@@ -1,0 +1,12 @@
+# case: SendEmailForRTM/rtm-code-fallback
+== reply ==
+{"result":"Success","message":""}
+== redis ==
+EmailFormat(project=ARS, category=EMAIL-TEST-EQPINFO)
+[EARS][공통 경보(code 대체)][EQP001][DISK_MONITOR]:<p>[code-fallback] host=EQP001 code=DISK_MONITOR</p>
+== mongo ==
+(변경 없음)
+== cassandra ==
+(변경 없음)
+== files ==
+(변경 없음)

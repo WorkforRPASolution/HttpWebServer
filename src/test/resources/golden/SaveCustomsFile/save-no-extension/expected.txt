@@ -1,0 +1,12 @@
+# case: SaveCustomsFile/save-no-extension
+== reply ==
+{"result":"Success","message":""}
+== redis ==
+(변경 없음)
+== mongo ==
+(변경 없음)
+== cassandra ==
+customfiles
+  + {"body":"<5 bytes sha256:2cf24dba5fb0>","eqpid":"EQP001","fname":"README","month":7,"year":2026}
+== files ==
+(변경 없음)

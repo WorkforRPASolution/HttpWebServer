@@ -1,0 +1,25 @@
+{
+  "EMAIL_TEMPLATE_REPOSITORY": [
+    {"process": "PHOTO", "model": "MODEL-A", "code": "RESOURCE_MONITOR", "subcode": "CPU_CRITICAL", "title": "자원 경보(정확)",
+     "html": "<p>[exact] host=@Hostname proc=@Process model=@Model ip=@IP line=@Line code=@CODE sev=@Severity cur=@CurrentValue link=http://@HttpWebServerAddress/x snap=@__snapshot__</p>"},
+    {"process": "PHOTO", "model": "MODEL-A", "code": "RESOURCE_MONITOR", "subcode": "_", "title": "자원 경보(subcode 대체)",
+     "html": "<p>[subcode-fallback] host=@Hostname line=@Line code=@CODE sdwt=@Sdwt ip=@IP</p>"},
+    {"process": "PHOTO", "model": "MODEL-A", "code": "_", "subcode": "_", "title": "공통 경보(code 대체)",
+     "html": "<p>[code-fallback] host=@Hostname code=@CODE</p>"},
+    {"process": "PHOTO", "model": "MODEL-A", "code": "SC_RESTART", "subcode": "_", "title": "재시작 스크립트",
+     "html": "<p>[script] host=@Hostname ip=@IP line=@Line code=@CODE out=@Out</p>"}
+  ],
+  "EMAIL_RECIPIENTS": [
+    {"app": "ARS", "code": "RESOURCE_MONITOR", "process": "PHOTO", "model": "MODEL-A", "line": "L1", "emailCategory": "EMAIL-TEST-EXACT"},
+    {"app": "ARS", "code": "RESOURCE_MONITOR", "process": "PHOTO", "model": "MODEL-A", "line": "all", "emailCategory": "EMAIL-TEST-LINEALL"},
+    {"app": "ARS", "code": "RESOURCE_MONITOR", "process": "PHOTO", "model": "all", "line": "all", "emailCategory": "EMAIL-TEST-MODELALL"},
+    {"app": "ARS", "code": "RESOURCE_MONITOR", "process": "all", "model": "all", "line": "all", "emailCategory": "EMAIL-TEST-ALL"},
+    {"app": "ARS", "code": "SC_RESTART", "process": "PHOTO", "model": "MODEL-A", "line": "L1", "emailCategory": "EMAIL-TEST-SCRIPT"}
+  ],
+  "EQP_LINE_MAP": [
+    {"line": "L1", "lineDesc": "1라인"}
+  ],
+  "EQP_INFO": [
+    {"eqpId": "EQP001", "category": "SDWT-A", "emailcategory": "EMAIL-TEST-EQPINFO"}
+  ]
+}

@@ -1,0 +1,1 @@
+{"message":"AddHistory","base":"history","set":{"text":"<script>alert(1)</script>"},"knownIssue":"KNOWN-ISSUE 3: 이력 HTML 을 이스케이프하지 않고 저장·출력한다"}

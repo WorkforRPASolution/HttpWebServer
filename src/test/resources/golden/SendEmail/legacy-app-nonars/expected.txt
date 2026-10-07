@@ -1,0 +1,13 @@
+# case: SendEmail/legacy-app-nonars
+# KNOWN-ISSUE: KNOWN-ISSUE 4: 템플릿 조회 키에 app 이 없어 다른 앱도 같은 템플릿을 쓴다
+== reply ==
+{"result":"Success","message":""}
+== redis ==
+EmailFormat(project=RMS, category=EMAIL-TEST-EXACT)
+[RMS][자원 경보(정확)][EQP001][RESOURCE_MONITOR-CPU_CRITICAL]:<p>[exact] host=EQP001 proc=PHOTO model=MODEL-A ip=10.0.0.99 line=1라인 code=RESOURCE_MONITOR-CPU_CRITICAL sev=CRITICAL cur=96.5 link=http://hws.golden:8080/x snap=</p>
+== mongo ==
+(변경 없음)
+== cassandra ==
+(변경 없음)
+== files ==
+(변경 없음)

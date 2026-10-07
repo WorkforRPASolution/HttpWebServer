@@ -1,0 +1,1 @@
+{"message":"SendRecoveryEmail","base":"recovery","set":{"body":"<b>비용 $100</b> \\1"},"fixtures":["email-base","recovery-wrapper"]}
