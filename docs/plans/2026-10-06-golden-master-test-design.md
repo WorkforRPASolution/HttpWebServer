@@ -1,7 +1,7 @@
 # HttpWebServer 골든 마스터 테스트 설계
 
 - 작성일: 2026-10-06
-- 상태: 설계 합의 완료. 구현 계획은 `2026-10-06-golden-master-test-plan.md`
+- 상태: 구현 완료 (2026-10-07, 브랜치 test/golden-master). 실행·갱신 방법은 docs/testing.md
 - 갱신 (2026-10-06): 계획을 쓰며 실험으로 확인한 사실을 반영했다. 바뀐 곳은 3장의 KNOWN-ISSUE 7·8과 특이 동작, 4.1·4.2, 5.2, 6장이다.
 - 기준 코드: `email-group-routing`의 `3e5c765`. PR #1 머지분과 Cassandra 키스페이스·컬럼 수정이 들어 있고, 아직 push 전이다.
 - 작업 브랜치: `test/golden-master`. worktree는 `ARS/HttpWebServer-golden`이다.
