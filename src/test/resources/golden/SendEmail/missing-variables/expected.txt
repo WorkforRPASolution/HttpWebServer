@@ -1,0 +1,11 @@
+# case: SendEmail/missing-variables
+== reply ==
+{"result":"Fail","message":"No usable value for variables\nExpected object but got JNothing"}
+== redis ==
+(변경 없음)
+== mongo ==
+(변경 없음)
+== cassandra ==
+(변경 없음)
+== files ==
+(변경 없음)

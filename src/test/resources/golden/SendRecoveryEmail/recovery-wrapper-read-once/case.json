@@ -1,0 +1,1 @@
+{"message":"SendRecoveryEmail","base":"recovery","fixtures":["email-base"],"mongoAfterStart":{"EMAIL_TEMPLATE_REPOSITORY":[{"process":"all","model":"all","code":"RecoveryDefault","subcode":"_","title":"복구 래퍼","html":"<div class=\"wrap\">@contents</div>"}]},"knownIssue":"KNOWN-ISSUE 5: RecoveryDefault 를 액터 시작 때 한 번만 읽어, 시작 뒤에 넣은 래퍼가 쓰이지 않는다"}

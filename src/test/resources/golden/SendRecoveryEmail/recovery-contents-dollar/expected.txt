@@ -1,0 +1,12 @@
+# case: SendRecoveryEmail/recovery-contents-dollar
+== reply ==
+{"result":"Success","message":""}
+== redis ==
+EmailFormat(project=ARS, category=EMAIL-TEST-SCRIPT)
+[EARS][복구] EQP001 SC_RESTART:<div class="wrap"><b>비용 $100</b> \1</div><p>proc=PHOTO model=MODEL-A eqp=EQP001 line=1라인 sdwt=SDWT-A snap=@__snapshot__</p>
+== mongo ==
+(변경 없음)
+== cassandra ==
+(변경 없음)
+== files ==
+(변경 없음)

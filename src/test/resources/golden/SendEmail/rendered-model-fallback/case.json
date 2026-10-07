@@ -1,0 +1,1 @@
+{"message":"SendEmail","base":"rms:rendered","set":{"model":"MODEL-B","line":"L9"},"fixtures":["email-base"]}

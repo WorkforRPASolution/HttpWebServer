@@ -1,0 +1,1 @@
+{"message":"SendEmailForRTM","base":"rtm","set":{"eqpid":"EQP999","code":"DISK_MONITOR"},"fixtures":["email-base"]}

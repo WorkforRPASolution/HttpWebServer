@@ -1,0 +1,11 @@
+# case: ScriptResult/script-no-category
+== reply ==
+{"result":"Fail","message":"There is no email category"}
+== redis ==
+(변경 없음)
+== mongo ==
+(변경 없음)
+== cassandra ==
+(변경 없음)
+== files ==
+(변경 없음)

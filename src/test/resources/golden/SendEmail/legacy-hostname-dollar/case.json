@@ -1,0 +1,1 @@
+{"message":"SendEmail","base":"rms:legacy","set":{"hostname":"EQP$1"},"fixtures":["email-base"],"knownIssue":"KNOWN-ISSUE 6: hostname 의 $ 를 정규식 그룹 참조로 해석해 치환 중 예외가 난다"}
