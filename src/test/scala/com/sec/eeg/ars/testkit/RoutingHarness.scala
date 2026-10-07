@@ -20,7 +20,7 @@ import scala.concurrent.duration._
 
 /**
  * HttpEndPoint 를 운영(Master.WebServiceStart)과 같은 방식으로 띄운다: Jetty WebAppContext + ScalatraListener + ScalatraBootstrap.
- * 다른 점: 포트는 임의, 부트스트랩 이름은 패키지까지 적는다 (운영 값 "ScalatraBootstrap" 은 KNOWN-ISSUE 7 로 기동 실패).
+ * 다른 점: 포트는 임의다.
  * HttpWorker·EmailWorker 자리에는 받은 메시지를 기록하고 reply 로 응답하는 Responder 를 둔다.
  */
 final class RoutingHarness {
@@ -83,7 +83,7 @@ final class RoutingHarness {
 
 object RoutingHarness {
   val DefaultReply = """{"result":"Success","message":""}"""
-  val BootstrapClassName = "com.sec.eeg.ars.ScalatraBootstrap"
+  val BootstrapClassName = "ScalatraBootstrap" // Master.WebServiceStart 와 같은 값
 
   final case class Response(status: Int, body: Array[Byte], headers: Map[String, String]) {
     def text: String = new String(body, UTF_8)

@@ -1,6 +1,7 @@
 # case: AddHistory/add-history-missing-image
 == reply ==
-{"result":"Failed","message":"No usable value for image\nDid not find value which can be converted into java.lang.String"}
+scala.Tuple2: (false,No usable value for image
+Did not find value which can be converted into java.lang.String)
 == redis ==
 (변경 없음)
 == mongo ==

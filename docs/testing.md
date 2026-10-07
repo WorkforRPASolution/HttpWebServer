@@ -80,21 +80,24 @@ mvn test -Pgolden -Dsuites=com.sec.eeg.ars.golden.MailGoldenSpec   # 스위트 �
 
 | # | 결함 | 고정한 곳 |
 |---|---|---|
-| 1 | JDK 8 ImageIO에 TIFF 리더가 없다. TIFF→JPEG 변환이 null이 되고 `.tif`·`.TIF`·`.tiff` 첨부 저장이 Failed가 된다 | `ImageUtilsSpec`, `SaveCustomsFile/save-tif-*`, `save-tiff` |
+| 1 | JDK 8 ImageIO에 TIFF 리더가 없다. TIFF→JPEG 변환이 null이 되고 `.tif`·`.TIF`·`.tiff` 첨부 저장이 Failed가 된다 | `ImageUtilsSpec`, `SaveCustomFile/save-tif-*`, `save-tiff` |
 | 2 | URL 값을 CQL 문자열에 그대로 붙인다 (주입 위험) | `QueryHistory/query-history-injection`, `CustomFiles/customfiles-injection`, `SnapShotImage/snapshot-bad-crtime` |
 | 3 | 이력 HTML을 이스케이프하지 않는다. `/ARS/AppendHistory`는 인증이 없다 | `HistoryTemplateSpec`, `AddHistory/add-history-script-text`, `QueryHistory/query-history-unescaped` |
 | 4 | 메일 템플릿 조회·갱신 키에 `app`이 없다 | `SendEmail/legacy-app-nonars`, `LoadEmailTemplate/import-app-overwrite` |
 | 5 | `RecoveryDefault`를 액터 시작 때 한 번만 읽는다 | `SendRecoveryEmail/recovery-wrapper-read-once` |
 | 6 | 고정 필드(`hostname` 등)의 `$`가 치환 중 예외를 낸다 | `SendEmail/legacy-hostname-dollar` |
-| 7 | `Master.WebServiceStart`의 부트스트랩 이름 `"ScalatraBootstrap"`으로는 Jetty가 뜨지 않는다. 옮겨 적기 오류로 추정한다 | `BootstrapLifecycleSpec` |
+| 7 | ~~`Master.WebServiceStart`의 부트스트랩 이름 `"ScalatraBootstrap"`으로는 Jetty가 뜨지 않는다~~ 해결(2026-10-07). 옮겨 적기 오류였다. 사내 원본의 `ScalatraBootstrap`은 `package` 줄 없이 기본 패키지에 있다 | `BootstrapLifecycleSpec`(정상 기동을 고정) |
 | 8 | 오류 응답에 내부 정보가 나간다. 스택 트레이스, 예외 내용, 전체 라우트 목록이다 | `HttpEndPointRoutingSpec` |
 
 ## 특이 동작 (결함으로 단정하지 않고 기록만 한 것)
 
-- 대괄호가 겹치는 제목: 미리 렌더한 본문 경로는 `[EARS][[EARS] CPU CRITICAL - EQP001]…`, `ScriptResult`는 `[[EARS][Script 성공]][제목][장비]스크립트명:`.
+- 대괄호가 겹치는 제목: 미리 렌더한 본문 경로는 `[EARS][[EARS] CPU CRITICAL - EQP001]…`다.
+- 코드에 대괄호가 없는 제목: RTM 메일은 `[EARS][제목][장비]코드:`다. `SendEmail`은 `[EARS][제목][장비][코드]:`다.
+- 템플릿 3차 폴백은 `(all, all, _, _)`다. `(공정, 모델, _, _)` 템플릿은 쓰이지 않는다. `email-base`의 `공통 경보(code 대체)`가 그 예다.
 - 치환되지 않는 토큰: RTM 메일의 `@IP`, 스냅샷이 없을 때 복구 메일의 `@__snapshot__`.
-- 이름·폴더 처리: `indext-` 접두사 파일의 제목은 `-…`가 된다. `LoadEmailTemplate`는 폴더가 없어도 Success를 돌려준다. 팝업·이미지 문서가 중복이면 빈 응답이 된다.
+- 이름·폴더 처리: `LoadEmailTemplate`는 폴더가 없어도 Success를 돌려준다. 팝업·이미지 문서가 중복이면 빈 응답이 된다.
 - HTTP 응답 형식: 문자열 응답은 `text/plain`, 바이트 응답은 `application/octet-stream`으로 나간다. CORS 사전 요청(OPTIONS)은 405다.
+- `AppendHistory`는 JSON이 아니라 Scala 튜플로 답한다: `(true,success)`, 실패하면 `(false,오류 메시지)`. 이력 조회(`QueryHistory`) 오류는 500(`InternalServerError`)이다.
 
 ## 문제 해결
 

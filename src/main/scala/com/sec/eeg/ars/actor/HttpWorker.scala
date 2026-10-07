@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory
 import sun.misc.BASE64Decoder
 
 case class AddHistory(body: String)
-case class SaveCustomsFile(body: String)
+case class SaveCustomFile(body: String)
 case class QueryHistory(eqpid: String, txn: Long)
 
 class HttpWorker(cassandraConnection: Cluster) extends Actor {
@@ -41,7 +41,7 @@ class HttpWorker(cassandraConnection: Cluster) extends Actor {
   }
 
   override def receive : Receive = {
-    case SaveCustomsFile(body) =>
+    case SaveCustomFile(body) =>
       try{
         val data = parse(body)
         val conv = data.extract[CustomFilesFormat]
@@ -88,14 +88,14 @@ class HttpWorker(cassandraConnection: Cluster) extends Actor {
         val boundStatement = new BoundStatement(addHistory_ps)
         val result = session.execute(boundStatement.bind(conv.hostname,Long.box(conv.txn),Int.box(conv.step),addString))
 
-        sender() ! JsonInterfaces.toJson(HttpResponse("Success", ""))
+        sender() ! (true,"success")
       }
       catch {
         case ex: DriverException => log.warn(s"Cassandra driver exception:${ex.getMessage}")
-          sender() ! JsonInterfaces.toJson(HttpResponse("Failed", ex.getMessage))
+          sender() ! (false,ex.getMessage)
           throw ex
         case ex: Throwable => log.warn(s"Exception:${ex.getMessage}")
-          sender() ! JsonInterfaces.toJson(HttpResponse("Failed", ex.getMessage))
+          sender() ! (false,ex.getMessage)
       }
 
     case QueryHistory(eqpid,txn) =>
@@ -114,10 +114,10 @@ class HttpWorker(cassandraConnection: Cluster) extends Actor {
       }
       catch {
         case ex: DriverException => log.warn(s"Cassandra driver exception:${ex.getMessage}")
-          sender() ! JsonInterfaces.toJson(HttpResponse("Failed", ex.getMessage))
+          sender() ! InternalServerError(ex.getMessage)
           throw ex
         case ex: Throwable => log.warn(s"Exception:${ex.getMessage}")
-          sender() ! JsonInterfaces.toJson(HttpResponse("Failed", ex.getMessage))
+          sender() ! InternalServerError(ex.getMessage)
       }
 
     case _ =>

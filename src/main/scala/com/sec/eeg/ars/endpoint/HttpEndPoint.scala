@@ -105,7 +105,7 @@ class HttpEndPoint(system:ActorSystem) extends ScalatraServlet with FutureSuppor
     }
   }
 
-  get("/ARS/History/:hostname/:txn") {
+  get("/ARS/History/:hostname/:txn") { //EQP_AUTO_RECOVERY unique 추가로 인해 'code' 항목을 추가해야 함. Get하는 Client 도 함께 수정할 필요가 있음
     new AsyncResult() {
       override val is: Future[_] = {
         log.info(s"Query History request received: ${params("hostname")}, ${params("txn")}")
@@ -153,8 +153,8 @@ class HttpEndPoint(system:ActorSystem) extends ScalatraServlet with FutureSuppor
   post("/ARS/SaveCustomfiles") {
     new AsyncResult() {
       override val is: Future[_] = {
-        log.info("SaveCustomfiles Result received")
-        system.actorSelection("/user/Master/HttpWorker") ? SaveCustomsFile(request.body)
+        log.info("SaveCustomfiles request received")
+        system.actorSelection("/user/Master/HttpWorker") ? SaveCustomFile(request.body)
       }
     }
   }
@@ -162,7 +162,7 @@ class HttpEndPoint(system:ActorSystem) extends ScalatraServlet with FutureSuppor
   get("/ARS/Customfiles/:eqpid/:year/:month/:fname") {
     new AsyncResult() {
       override val is: Future[_] = {
-        log.info("CustomFiles Result received")
+        log.info("CustomFiles request received")
         system.actorSelection("/user/Master/EmailWorker") ? CustomFiles(params("eqpid"),params("year").toInt,params("month").toInt,params("fname"))
       }
     }

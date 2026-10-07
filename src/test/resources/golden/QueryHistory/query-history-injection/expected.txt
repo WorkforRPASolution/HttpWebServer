@@ -1,7 +1,7 @@
 # case: QueryHistory/query-history-injection
 # KNOWN-ISSUE: KNOWN-ISSUE 2: URL 로 받은 값을 CQL 문자열에 그대로 붙여 쿼리가 깨진다 (주입 위험)
 == reply ==
-{"result":"Failed","message":"line 1:46 mismatched input 'OR' expecting EOF (...historylog where eqpid = 'x' [OR]...)"}
+ActionResult(status=500, body=line 1:46 mismatched input 'OR' expecting EOF (...historylog where eqpid = 'x' [OR]...))
 == redis ==
 (변경 없음)
 == mongo ==

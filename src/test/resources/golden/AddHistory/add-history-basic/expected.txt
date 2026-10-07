@@ -1,6 +1,6 @@
 # case: AddHistory/add-history-basic
 == reply ==
-{"result":"Success","message":""}
+scala.Tuple2: (true,success)
 == redis ==
 (변경 없음)
 == mongo ==

@@ -55,7 +55,7 @@ object GoldenMessages {
       case "SnapShotImage" => (EmailWorkerPath, SnapShotImage(p("eqpid"), p("crtime")))
       case "AddHistory" => (HttpWorkerPath, AddHistory(body))
       case "QueryHistory" => (HttpWorkerPath, QueryHistory(p("eqpid"), p("txn").toLong))
-      case "SaveCustomsFile" => (HttpWorkerPath, SaveCustomsFile(body))
+      case "SaveCustomFile" => (HttpWorkerPath, SaveCustomFile(body))
       case other => throw new IllegalArgumentException(s"${c.id}: 모르는 message: $other")
     }
   }

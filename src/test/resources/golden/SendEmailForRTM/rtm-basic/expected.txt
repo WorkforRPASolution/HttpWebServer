@@ -3,7 +3,7 @@
 {"result":"Success","message":""}
 == redis ==
 EmailFormat(project=ARS, category=EMAIL-TEST-EXACT)
-[EARS][자원 경보(subcode 대체)][EQP001][RESOURCE_MONITOR]:<p>[subcode-fallback] host=EQP001 line=1라인 code=RESOURCE_MONITOR sdwt=SDWT-A ip=@IP</p>
+[EARS][자원 경보(subcode 대체)][EQP001]RESOURCE_MONITOR:<p>[subcode-fallback] host=EQP001 line=1라인 code=RESOURCE_MONITOR sdwt=SDWT-A ip=@IP</p>
 == mongo ==
 (변경 없음)
 == cassandra ==

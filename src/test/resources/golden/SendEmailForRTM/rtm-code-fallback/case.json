@@ -1,1 +1,1 @@
-{"message":"SendEmailForRTM","base":"rtm","set":{"code":"DISK_MONITOR"},"fixtures":["email-base"]}
+{"message":"SendEmailForRTM","base":"rtm","set":{"code":"DISK_MONITOR"},"fixtures":["email-base","email-all-fallback"]}

@@ -1,0 +1,13 @@
+# case: LoadEmailTemplate/import-index-prefix
+== reply ==
+{"result":"Success","message":""}
+== redis ==
+(변경 없음)
+== mongo ==
+EMAIL_TEMPLATE_REPOSITORY
+  + {"code":"RM_MEM","html":"<p>memory</p>","model":"MODEL-A","process":"PHOTO","subcode":"_","title":"Memory"}
+== cassandra ==
+(변경 없음)
+== files ==
+- email/ARS^PHOTO^MODEL-A^RM_MEM/index-Memory.html
++ email/_workdone/ARS^PHOTO^MODEL-A^RM_MEM/index-Memory.html

@@ -1,1 +1,1 @@
-{"message":"ScriptResult","base":"script","set":{"scname":"SC_NOCAT","hostname":"EQP999"},"fixtures":["email-base"]}
+{"message":"ScriptResult","base":"script","set":{"scname":"SC_NOCAT","hostname":"EQP999"},"fixtures":["email-base","email-all-fallback"]}

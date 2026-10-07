@@ -1,1 +1,1 @@
-{"message":"SendEmail","base":"rms:legacy","set":{"code":"DISK_MONITOR","subcode":""},"fixtures":["email-base"]}
+{"message":"SendEmail","base":"rms:legacy","set":{"code":"DISK_MONITOR","subcode":""},"fixtures":["email-base","email-all-fallback"]}

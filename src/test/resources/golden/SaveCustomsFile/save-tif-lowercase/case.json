@@ -1,1 +1,0 @@
-{"message":"SaveCustomsFile","base":"customfile","set":{"fname":"scan.tif","contents":{"$file":"_files/favicon.tif"}},"knownIssue":"KNOWN-ISSUE 1: JDK 8 ImageIO 에 TIFF 리더가 없어 변환 결과가 null 이 되고 저장이 실패한다"}

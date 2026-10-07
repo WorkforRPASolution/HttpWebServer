@@ -8,7 +8,6 @@ import com.datastax.driver.core.exceptions.DriverException
 import com.datastax.driver.core.{Session => _, _}
 import com.mongodb.BasicDBObject
 import com.mongodb.client.model.UpdateOptions
-import com.mongodb.internal.session.BaseClientSessionImpl
 import com.sec.eeg.ars.data._
 import com.typesafe.config.Config
 import org.apache.commons.io.FileUtils
@@ -49,7 +48,7 @@ class EmailWorker(conf: Config, cassandraConnection: Cluster) extends Actor {
       val crtime = System.currentTimeMillis()
       val decoder = new BASE64Decoder
       val imageByte = decoder.decodeBuffer(img)
-      log.debug(s"Imgae size: ${imageByte.length}")
+      log.debug(s"Image size: ${imageByte.length}")
       val boundStatement = new BoundStatement(emailsnapshot_ps)
       val result = session.execute(boundStatement.bind(eqpid, Long.box(crtime), ByteBuffer.wrap(imageByte)))
       log.info(s"new email snapshot inserted: ${eqpid}-${crtime}")
@@ -95,7 +94,7 @@ class EmailWorker(conf: Config, cassandraConnection: Cluster) extends Actor {
         if (searchRet2.size == 1) {
           retTPL = (searchRet2.head.getString("title"), searchRet2.head.getString("html"))
         } else {
-          val search3 = new BasicDBObject().append("process",process).append("model",model).append("code","_").append("subcode","_")
+          val search3 = new BasicDBObject().append("process","all").append("model","all").append("code","_").append("subcode","_")
           val searchRet3 = emailTempl_table.find(search3).asScala
           if (searchRet3.size == 1) {
             retTPL = (searchRet3.head.getString("title"), searchRet3.head.getString("html"))
@@ -164,7 +163,7 @@ class EmailWorker(conf: Config, cassandraConnection: Cluster) extends Actor {
       val search = new BasicDBObject().append("process",process).append("model",model).append("code",code)
       val searchRet = emailNotificationMeta_table.find(search).asScala
       if (searchRet.size == 1) {
-        searchRet.head.getString("category").toInt
+        searchRet.head.getLong("category").toInt
       } else {
         -1
       }
@@ -187,7 +186,7 @@ class EmailWorker(conf: Config, cassandraConnection: Cluster) extends Actor {
 
       val searchResult1 = searchRet.find(x => {x.getString("process") == process && x.getString("model") == model && x.getString("line") == line})
       val searchResult2 = searchRet.find(x => {x.getString("process") == process && x.getString("model") == model && x.getString("line") == "all"})
-
+      //3.0.8-model, process all case 추가
       val searchResult3 = searchRet.find(x => {x.getString("process") == process && x.getString("model") == "all" && x.getString("line") == "all"})
       val searchResult4 = searchRet.find(x => {x.getString("process") == "all" && x.getString("model") == "all" && x.getString("line") == "all"})
 
@@ -226,7 +225,7 @@ class EmailWorker(conf: Config, cassandraConnection: Cluster) extends Actor {
     try {
       val scPropertyTable = ServiceConfig.database.getCollection("SC_PROPERTY")
       val search = new BasicDBObject().append("process",process).append("eqpModel",model).append("scname",scname)
-      val jsonString = scPropertyTable.find(search).asScala.head.toJson()
+      val jsonString = scPropertyTable.find(search).asScala.head.toJson
       val json = parse(jsonString)
       if(isSuccess){
         json \ "property" \ "DoNotSendEmailWhenSuccess" match {
@@ -257,12 +256,12 @@ class EmailWorker(conf: Config, cassandraConnection: Cluster) extends Actor {
       val projection = new BasicDBObject().append("category", true).append("_id", false)
       val searchRet = eqpinfo_table.find(search).projection(projection).limit(1).asScala
 
-      if(searchRet.size == 1) {
+      if (searchRet.size == 1) {
         retSdwt = searchRet.head.getString("category")
         log.info(s"eqpid category: ${retSdwt}")
       }
       retSdwt
-    }catch {
+    } catch {
       case ex : Throwable =>
         log.warn(s"getSdwt failed: $eqpid, ${ex.getMessage}")
         ""
@@ -291,7 +290,7 @@ class EmailWorker(conf: Config, cassandraConnection: Cluster) extends Actor {
         val popupTempl_table = ServiceConfig.database.getCollection("POPUP_TEMPLATE_REPOSITORY")
         val search = new BasicDBObject().append("process",process).append("model",model).append("code",code)
         val searchRet = popupTempl_table.find(search).asScala
-        if(searchRet.size ==1){
+        if(searchRet.size ==1 ){
           sender() ! searchRet.head.getString("html")
         }else{
           sender() ! Array.empty[Byte]
@@ -307,7 +306,7 @@ class EmailWorker(conf: Config, cassandraConnection: Cluster) extends Actor {
         val popupTempl_table = ServiceConfig.database.getCollection("POPUP_TEMPLATE_REPOSITORY")
         val search = new BasicDBObject().append("process",process).append("model",model).append("code",code)
         val searchRet = popupTempl_table.find(search).asScala
-        if(searchRet.size ==1){
+        if(searchRet.size == 1){
           val html = searchRet.head.getString("html")
           val noSendEmail = Option(searchRet.head.getBoolean("noSendEmail")).getOrElse(false)
           sender() ! s"$html,${noSendEmail.toString}"
@@ -316,7 +315,7 @@ class EmailWorker(conf: Config, cassandraConnection: Cluster) extends Actor {
         }
       }
       catch {
-        case ex : Throwable => log.warn(s"Get PopupContent(${process},${model},${code}) failed: ${ex.getMessage}")
+        case ex : Throwable => log.warn(s"Get PopupContentV2(${process},${model},${code}) failed: ${ex.getMessage}")
           sender() ! Array.empty[Byte]
       }
 
@@ -335,16 +334,16 @@ class EmailWorker(conf: Config, cassandraConnection: Cluster) extends Actor {
 
           if (conv.success) {
             mailTitlePrefix = s"${mailTitlePrefix}[Script 성공]"
-            log.info(s"Script Success - process: ${conv.process}, line: ${conv.line}, eqpid: ${conv.hostname}, script: ${conv.scname}, category: ${category}")
+            log.info(s"Script Success - process: ${conv.process}, line: ${conv.line}, model: ${conv.model}, eqpid: ${conv.hostname}, script: ${conv.scname}, category: ${category}")
           } else {
             mailTitlePrefix = s"${mailTitlePrefix}[Script 실패]"
-            log.info(s"Script Fail - process: ${conv.process}, line: ${conv.line}, eqpid: ${conv.hostname}, script: ${conv.scname}, category: ${category}")
+            log.info(s"Script Fail - process: ${conv.process}, line: ${conv.line}, model: ${conv.model}, eqpid: ${conv.hostname}, script: ${conv.scname}, category: ${category}")
           }
 
           // Update MongoDB - Script Result
           /* Data 다량 발생으로 일단 주석처리
           val curTS = System.currentTimeMillis()
-          val status = if(conv.success) "Success" else "Failed"
+          val status = if (conv.success) "Success" else "Failed"
           val triggeredBy = if(conv.variables.contains("@Trigger")) conv.variables("@Trigger") else "Unknown"
 
           updateAutoRecovery(conv.process, conv.model, conv.hostname, conv.line, conv.scname, curTS, conv.variables, triggeredBy, status)
@@ -353,7 +352,7 @@ class EmailWorker(conf: Config, cassandraConnection: Cluster) extends Actor {
           val subcode = "_"
 
           val emailTemplate = getEmailBody("ARS", conv.process, conv.model, conv.scname, subcode)
-          if (emailTemplate != null){
+          if (emailTemplate != null) {
             var retString = emailTemplate._2
             var emailtitle = emailTemplate._1
             retString = retString.replaceAll("@Hostname", conv.hostname)
@@ -375,7 +374,7 @@ class EmailWorker(conf: Config, cassandraConnection: Cluster) extends Actor {
 
             if (_emailCategory != "") {
               log.info(s"Send script result to ${_emailCategory}: ${mailTitlePrefix}[${emailtitle}][${conv.hostname}]${conv.scname}")
-              context.actorSelection("/user/Master/RedisActor") ! EmailFormat("ARS", _emailCategory, s"[${mailTitlePrefix}][${emailtitle}][${conv.hostname}]${conv.scname}:${retString}")
+              context.actorSelection("/user/Master/RedisActor") ! EmailFormat("ARS", _emailCategory, s"${mailTitlePrefix}[${emailtitle}][${conv.hostname}]${conv.scname}:${retString}")
               sender() ! JsonInterfaces.toJson(HttpResponse("Success", ""))
             }
             else {
@@ -403,7 +402,7 @@ class EmailWorker(conf: Config, cassandraConnection: Cluster) extends Actor {
         }
 
         if(retContents == null){
-          log.info(s"There si no custom files: ${eqpid}, ${year}, ${month}, ${fname}")
+          log.info(s"There is no custom files: ${eqpid}, ${year}, ${month}, ${fname}")
           sender() ! Array.empty[Byte]
         }
         else{
@@ -421,20 +420,20 @@ class EmailWorker(conf: Config, cassandraConnection: Cluster) extends Actor {
 
     case SnapShotImage(eqpid,crtime) =>
       val query = s"select body from emailsnapshot where eqpid = '${eqpid}' and timestamp = ${crtime};"
-      log.info(s"get CustomFiles: ${eqpid}, ${crtime}")
-      var retContents : ByteBuffer = null
+      log.info(s"get snapshot: ${eqpid}-${crtime}")
+      var retImg : ByteBuffer = null
       try{
         val result = session.execute(query)
         if(result.iterator().hasNext){
-          retContents = result.iterator().next().getBytes("body")
+          retImg = result.iterator().next().getBytes("body")
         }
 
-        if(retContents == null){
-          log.info(s"There si no snapshot image: ${eqpid}-${crtime}")
+        if(retImg == null){
+          log.info(s"There is no snapshot image: ${eqpid}-${crtime}")
           sender() ! Array.empty[Byte]
         }
         else{
-          sender() ! retContents.array()
+          sender() ! retImg.array()
         }
       }
       catch {
@@ -505,7 +504,7 @@ class EmailWorker(conf: Config, cassandraConnection: Cluster) extends Actor {
         var category = getEmailNotificationCategory(conv.process, conv.model, conv.code)
 
         val subcode = "_"
-        log.info(s"EmailNotify logging - process: ${conv.process}, line: ${conv.line}, model: ${conv.model}, app: ARS, code: ${conv.code}, subcode: ${subcode}, category: ${category}")
+        log.info(s"EmailNotify logging - process: ${conv.process}, line: ${conv.line}, model: ${conv.model}, eqpid: ${conv.eqpid}, app: ARS, code: ${conv.code}, subcode: ${subcode}, category: ${category}")
 
         val emailTemplate = getEmailBody("ARS", conv.process, conv.model, conv.code, subcode)
         if (emailTemplate != null){
@@ -529,8 +528,8 @@ class EmailWorker(conf: Config, cassandraConnection: Cluster) extends Actor {
 
           if (_emailCategory != "") {
             val project = "EARS"
-            log.info(s"SendEmail - ARS,${_emailCategory}: [${project}][${emailtitle}][${conv.eqpid}][${conv.code}]")
-            context.actorSelection("/user/Master/RedisActor") ! EmailFormat("ARS", _emailCategory, s"[${project}][${emailtitle}][${conv.eqpid}][${conv.code}]:${retString}")
+            log.info(s"SendEmail - ARS,${_emailCategory}: [${project}][${emailtitle}][${conv.eqpid}]${conv.code}")
+            context.actorSelection("/user/Master/RedisActor") ! EmailFormat("ARS", _emailCategory, s"[${project}][${emailtitle}][${conv.eqpid}]${conv.code}:${retString}")
             sender() ! JsonInterfaces.toJson(HttpResponse("Success", ""))
             log.info(s"EmailNotify - process: ${conv.process}, line: ${conv.line}, model: ${conv.model}, eqpid: ${conv.eqpid}, app: ARS, code: ${conv.code}, subcode: ${subcode}, category: ${category}")
           }
@@ -543,7 +542,8 @@ class EmailWorker(conf: Config, cassandraConnection: Cluster) extends Actor {
         }
       }
       catch {
-        case ex : Throwable => log.warn(s"SendEmailForRTM failed: ${ex.getMessage}")
+        case ex : Exception =>
+          log.error(s"SendEmailForRTM failed: ${ex.getMessage}")
           sender() ! JsonInterfaces.toJson(HttpResponse("Fail", ex.getMessage))
       }
 
@@ -584,62 +584,62 @@ class EmailWorker(conf: Config, cassandraConnection: Cluster) extends Actor {
           }
         }
         else {
-        // ===== legacy 템플릿 경로 — Option C 도입 전 원본 코드와 한 글자도 다르지 않게 유지 =====
-        val emailTemplate = getEmailBody(conv.app, conv.process, conv.model, conv.code, subcode)
-        if (emailTemplate != null){
-          var retString = emailTemplate._2
-          var emailtitle = emailTemplate._1
-          retString = retString.replaceAll("@Hostname", conv.hostname)
-          retString = retString.replaceAll("@Process", conv.process)
-          retString = retString.replaceAll("@Model", conv.model)
-          retString = retString.replaceAll("@IP", conv.ip)
-          retString = retString.replaceAll("@Line", getLineDescription(conv.line))
-          if (retString.contains("@Sdwt")) {
-            retString = retString.replaceAll("@Sdwt", getSdwt(conv.hostname))
-          }
-          var code = ""
-          if (subcode == "_")
-            code = s"${conv.code}"
-          else
-            code = s"${conv.code}-${conv.subcode}"
-          retString = retString.replaceAll("@CODE", s"${code}")
-          conv.variables.foreach( p => {
-            if (p._1 == "__snapshot__") {
-              log.info(s"snapshot received: ${p._1}")
-              val crtime = saveSnapshot(conv.hostname, p._2)
-              if (crtime != 0) {
-                log.info(s"snapshot link: http://${ServiceConfig.ServicePublicAddress}/ARS/SnapShotImage/${conv.hostname}/${crtime}")
-                retString = retString.replaceAll("@__snapshot__", s"http://${ServiceConfig.ServicePublicAddress}/ARS/SnapShotImage/${conv.hostname}/${crtime}")
+          // ===== legacy 템플릿 경로 — Option C 도입 전 원본 코드와 한 글자도 다르지 않게 유지 =====
+          val emailTemplate = getEmailBody(conv.app, conv.process, conv.model, conv.code, subcode)
+          if (emailTemplate != null){
+            var retString = emailTemplate._2
+            var emailtitle = emailTemplate._1
+            retString = retString.replaceAll("@Hostname", conv.hostname)
+            retString = retString.replaceAll("@Process", conv.process)
+            retString = retString.replaceAll("@Model", conv.model)
+            retString = retString.replaceAll("@IP", conv.ip)
+            retString = retString.replaceAll("@Line", getLineDescription(conv.line))
+            if (retString.contains("@Sdwt")) {
+              retString = retString.replaceAll("@Sdwt", getSdwt(conv.hostname))
+            }
+            var code = ""
+            if (subcode == "_")
+              code = s"${conv.code}"
+            else
+              code = s"${conv.code}-${conv.subcode}"
+            retString = retString.replaceAll("@CODE", s"${code}")
+            conv.variables.foreach( p => {
+              if (p._1 == "__snapshot__") {
+                log.info(s"snapshot received: ${p._1}")
+                val crtime = saveSnapshot(conv.hostname, p._2)
+                if (crtime != 0) {
+                  log.info(s"snapshot link: http://${ServiceConfig.ServicePublicAddress}/ARS/SnapShotImage/${conv.hostname}/${crtime}")
+                  retString = retString.replaceAll("@__snapshot__", s"http://${ServiceConfig.ServicePublicAddress}/ARS/SnapShotImage/${conv.hostname}/${crtime}")
+                }
               }
+              else {
+                log.info(s"variables - ${p._1}:${p._2}")
+                retString = retString.replaceAll(s"@${p._1}", java.util.regex.Matcher.quoteReplacement(s"${p._2}"))
+              }
+            })
+            retString = retString.replaceAll("@__snapshot__", "")
+            retString = retString.replaceAll("@HttpWebServerAddress", s"${ServiceConfig.ServicePublicAddress}")
+
+            // 공유 계약(EmailHttpDataFormat)이므로 legacy 분기에도 동일 적용:
+            // emailCategory 직접지정 시 역산 생략, displayId 시 헤드라인 분리.
+            val (_emailCategory, headline) = EmailRoutingResolver.resolve(
+              conv.emailCategory, conv.displayId, conv.hostname,
+              getEmailCategory(conv.process, conv.model, conv.hostname, conv.code, conv.line))
+
+            if (_emailCategory != "") {
+              val project = if (conv.app.contains("ARS")) "EARS" else conv.app
+              log.info(s"SendEmail - ${conv.app},${_emailCategory}: [${project}][${emailtitle}][${headline}][${code}]")
+              context.actorSelection("/user/Master/RedisActor") ! EmailFormat(conv.app, _emailCategory, s"[${project}][${emailtitle}][${headline}][${code}]:${retString}")
+              sender() ! JsonInterfaces.toJson(HttpResponse("Success", ""))
+              log.info(s"EmailNotify - process: ${conv.process}, line: ${conv.line}, model: ${conv.model}, eqpid: ${conv.hostname}, app: ${conv.app}, code: ${conv.code}, subcode: ${conv.subcode}, category: ${category}")
             }
             else {
-              log.info(s"variables - ${p._1}:${p._2}")
-              retString = retString.replaceAll(s"@${p._1}", java.util.regex.Matcher.quoteReplacement(s"${p._2}"))
+              sender() ! JsonInterfaces.toJson(HttpResponse("Fail", "There is no email category"))
             }
-          })
-          retString = retString.replaceAll("@__snapshot__", "")
-          retString = retString.replaceAll("@HttpWebServerAddress", s"${ServiceConfig.ServicePublicAddress}")
-
-          // 공유 계약(EmailHttpDataFormat)이므로 legacy 분기에도 동일 적용:
-          // emailCategory 직접지정 시 역산 생략, displayId 시 헤드라인 분리.
-          val (_emailCategory, headline) = EmailRoutingResolver.resolve(
-            conv.emailCategory, conv.displayId, conv.hostname,
-            getEmailCategory(conv.process, conv.model, conv.hostname, conv.code, conv.line))
-
-          if (_emailCategory != "") {
-            val project = if (conv.app.contains("ARS")) "EARS" else conv.app
-            log.info(s"SendEmail - ${conv.app},${_emailCategory}: [${project}][${emailtitle}][${headline}][${code}]")
-            context.actorSelection("/user/Master/RedisActor") ! EmailFormat(conv.app, _emailCategory, s"[${project}][${emailtitle}][${headline}][${code}]:${retString}")
-            sender() ! JsonInterfaces.toJson(HttpResponse("Success", ""))
-            log.info(s"EmailNotify - process: ${conv.process}, line: ${conv.line}, model: ${conv.model}, eqpid: ${conv.hostname}, app: ${conv.app}, code: ${conv.code}, subcode: ${conv.subcode}, category: ${category}")
           }
           else {
-            sender() ! JsonInterfaces.toJson(HttpResponse("Fail", "There is no email category"))
+            sender() ! JsonInterfaces.toJson(HttpResponse("Fail", "There is no email template"))
           }
-        }
-        else {
-          sender() ! JsonInterfaces.toJson(HttpResponse("Fail", "There is no email template"))
-        }
         }
       }
       catch {
@@ -672,7 +672,7 @@ class EmailWorker(conf: Config, cassandraConnection: Cluster) extends Actor {
                 try{
                   var contents = readFile.mkString
                   var htmlfileName = htmlfile.head.substring(0, htmlfile.head.length - 5)
-                  if(htmlfileName.startsWith("indext-"))
+                  if(htmlfileName.startsWith("index-"))
                     htmlfileName = htmlfileName.substring(6)
 
                   val prefix = s"${app}_${process}_${model}_${code}_${subcode}"
@@ -719,7 +719,7 @@ class EmailWorker(conf: Config, cassandraConnection: Cluster) extends Actor {
         localDir.listFiles().filter(_.isDirectory).filter(_.getName != "_workdone").foreach(
           d => {
             val dirInfos = d.getName.split('^')
-            var process, model, code = "_"
+            var process, model, code = ""
             if(dirInfos.size == 3 && dirInfos(0) != "" && dirInfos(1) != "" && dirInfos(2) != ""){
               process = dirInfos(0)
               model = dirInfos(1)

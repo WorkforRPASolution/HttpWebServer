@@ -1,4 +1,4 @@
-# case: SaveCustomsFile/save-null-fname
+# case: SaveCustomFile/save-null-fname
 == reply ==
 {"result":"Failed","message":"Invalid null value in condition for column fname"}
 == redis ==

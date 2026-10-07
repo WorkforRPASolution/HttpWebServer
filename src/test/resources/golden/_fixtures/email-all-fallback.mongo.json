@@ -1,0 +1,6 @@
+{
+  "EMAIL_TEMPLATE_REPOSITORY": [
+    {"process": "all", "model": "all", "code": "_", "subcode": "_", "title": "공통 경보(all 대체)",
+     "html": "<p>[all-fallback] host=@Hostname code=@CODE</p>"}
+  ]
+}

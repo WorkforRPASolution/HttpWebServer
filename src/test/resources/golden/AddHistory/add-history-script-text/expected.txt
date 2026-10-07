@@ -1,7 +1,7 @@
 # case: AddHistory/add-history-script-text
 # KNOWN-ISSUE: KNOWN-ISSUE 3: 이력 HTML 을 이스케이프하지 않고 저장·출력한다
 == reply ==
-{"result":"Success","message":""}
+scala.Tuple2: (true,success)
 == redis ==
 (변경 없음)
 == mongo ==

@@ -23,8 +23,8 @@ object ServiceConfig {
   var MyServiceAddress : String = ""
   var ServicePublicAddress : String = ""
   var CassandraAddress: String = _
-  var CassandraAuthenticationEnable = true
-  var RedisSentinelConnection : String = ""
+  var CassandraAuthenticationEnable = false
+  var RedisSentinelConnection : String = _
   val HttpWebServerRedisKey: String = "HttpWebServerInfo"
   var EmailTemplateImportLocation: String = _
   var PopupTemplateImportLocation: String = _
@@ -47,11 +47,11 @@ object ServiceConfig {
     val parser = new JSONParser
     val confjson = parser.parse(new FileReader(root_dir + s"/conf/${serviceName}/${serviceName}.json")).asInstanceOf[JSONObject]
 
-    val _httpPort = System.getenv("HTTP_PORT")
-    if(_httpPort == null || _httpPort.trim == ""){
-      System.exit(1)
+    val _HttpPort = System.getenv("HTTP_PORT")
+    if(_HttpPort == null || _HttpPort.trim == ""){
+      System.exit(5)
     }
-    HttpPort = _httpPort.toInt
+    HttpPort = _HttpPort.toInt
 
     try{
       ZookeeperQuorum = confjson.get("ZookeeperQuorum").asInstanceOf[String]
@@ -113,7 +113,7 @@ object ServiceConfig {
         EmailWorkerCount = 5
     } catch {
       case _ : Throwable =>
-      EmailWorkerCount = 5
+        EmailWorkerCount = 5
     }
 
     try {
@@ -150,7 +150,7 @@ object ServiceConfig {
   }
 
   def getVersion = {
-    val is = this.getClass.getClassLoader().getResourceAsStream("META-INF/maven/com.sec.eeg.ars/HttpWebServer/pom.properties")
+    val is = this.getClass.getClassLoader.getResourceAsStream("META-INF/maven/com.sec.eeg.ars/HttpWebServer/pom.properties")
 
     if (is != null) {
       val p = new Properties()

@@ -11,7 +11,7 @@ import com.datastax.driver.core.policies.{ExponentialReconnectionPolicy, RoundRo
 import com.datastax.driver.core.{Cluster, ConsistencyLevel, QueryOptions}
 import com.mongodb.client.MongoClients
 import com.sec.eeg.ars.data.ServiceConfig
-import com.sec.eeg.ars.data.ServiceConfig.{MongoDBUrl, conf, database, serviceName}
+import com.sec.eeg.ars.data.ServiceConfig.{MongoDBUrl, database}
 import com.sec.eeg.ars.endpoint.ShutdownServer
 import com.typesafe.config.ConfigFactory
 import org.apache.curator.framework.imps.CuratorFrameworkState
@@ -82,7 +82,7 @@ object Master {
     context.addEventListener(new ScalatraListener)
     server.setHandler(context)
 
-    server.start()
+    server.start
   }
 
   def WebServiceStop = {
@@ -167,7 +167,7 @@ class Master extends Actor {
 
     val httpworkerProp = Props(classOf[HttpWorker], cassandraConnection)
     val emailworkerProp = Props(classOf[EmailWorker], ServiceConfig.conf, cassandraConnection)
-    val redisworkerProp = Props(classOf[RedisActor])
+    val redisworkerProp = Props.create(classOf[RedisActor])
 
     val httpWorkerSupervisor = BackoffSupervisor.props(
       Backoff.onFailure(httpworkerProp, "HttpWorker", Duration.create(3, TimeUnit.SECONDS), Duration.create(30, TimeUnit.SECONDS), 0.2
@@ -191,8 +191,8 @@ class Master extends Actor {
       )
     )
 
-    val redisWorkerSupervisor = BackoffSupervisor.props(
-      Backoff.onFailure(redisworkerProp, "RedisWorker", Duration.create(3, TimeUnit.SECONDS), Duration.create(100, TimeUnit.SECONDS), 0.2
+    val redisWorkerPropSupervisor = BackoffSupervisor.props(
+      Backoff.onFailure(redisworkerProp, "RedisActor", Duration.create(3, TimeUnit.SECONDS), Duration.create(100, TimeUnit.SECONDS), 0.2
       ).withSupervisorStrategy(
         OneForOneStrategy() {
           case ex: Throwable =>
@@ -204,7 +204,7 @@ class Master extends Actor {
 
     database = MongoClients.create(MongoDBUrl).getDatabase("EARS") //prestart 에 중복?
 
-    createChildActor(context.actorOf(redisWorkerSupervisor, "RedisActor"))
+    createChildActor(context.actorOf(redisWorkerPropSupervisor, "RedisActor"))
     createChildActor(context.actorOf(SmallestMailboxPool(ServiceConfig.HttpWorkerCount).props(httpWorkerSupervisor),"HttpWorker"))
     createChildActor(context.actorOf(SmallestMailboxPool(ServiceConfig.EmailWorkerCount).props(emailWorkerSupervisor),"EmailWorker"))
     Master.WebServiceStart
@@ -233,7 +233,7 @@ class Master extends Actor {
     //x.x.x.1-zookeeper node 존재 확인 후 등록
     val zkNodePath = s"${zkBasePath}/${ServiceConfig.MyServiceAddress}"
     val zkNodeData = ServiceConfig.Version.getBytes
-    try{
+    try {
       zkCli.create().withMode(CreateMode.EPHEMERAL).forPath(zkNodePath,zkNodeData)
     } catch {
       case _ : NodeExistsException =>
@@ -269,7 +269,7 @@ class Master extends Actor {
         cassandraConnection.close()
       }
     }catch {
-      case ex : Throwable => log.error(s"Master postStop failed : ${ex.getMessage}")
+      case ex : Throwable => log.error(s"Master postStop failed : ${ex.getStackTraceString}")
     }
     ShutdownServer.stop
     log.info("Master postStop")
@@ -277,7 +277,7 @@ class Master extends Actor {
 
   def receive = {
     case ShutDown() =>
-      log.info("Shudown started")
+      log.info("Shutdown started")
 
       if(zkCli != null){
         zkCli.delete().forPath(s"${ServiceConfig.ZookeeperNodePath}/daemons/${ServiceConfig.MyServiceAddress}")

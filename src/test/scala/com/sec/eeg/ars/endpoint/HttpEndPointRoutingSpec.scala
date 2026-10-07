@@ -42,7 +42,7 @@ class HttpEndPointRoutingSpec extends FunSuite with BeforeAndAfterAll with Befor
     Route("POST", "/RTM/EmailNotify", "email", SendEmailForRTM(body)),
     Route("POST", "/RecoveryEmailNotify", "email", SendRecoveryEmail(body)),
     Route("POST", "/ARS/ScriptResult", "email", ScriptResult(body)),
-    Route("POST", "/ARS/SaveCustomfiles", "http", SaveCustomsFile(body)),
+    Route("POST", "/ARS/SaveCustomfiles", "http", SaveCustomFile(body)),
     Route("GET", "/ARS/Customfiles/EQP001/2026/07/report.txt", "email", CustomFiles("EQP001", 2026, 7, "report.txt")))
 
   routes.foreach { r =>

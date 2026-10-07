@@ -1,4 +1,4 @@
-# case: SaveCustomsFile/save-png
+# case: SaveCustomFile/save-text-file
 == reply ==
 {"result":"Success","message":""}
 == redis ==
@@ -7,6 +7,6 @@
 (변경 없음)
 == cassandra ==
 customfiles
-  + {"body":"<286 bytes sha256:99d69510d1da>","eqpid":"EQP001","fname":"photo.png","month":7,"year":2026}
+  + {"body":"<5 bytes sha256:2cf24dba5fb0>","eqpid":"EQP001","fname":"report.txt","month":7,"year":2026}
 == files ==
 (변경 없음)

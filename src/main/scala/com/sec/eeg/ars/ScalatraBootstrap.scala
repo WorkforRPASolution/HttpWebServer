@@ -1,5 +1,3 @@
-package com.sec.eeg.ars
-
 import com.sec.eeg.ars.actor.Master
 import com.sec.eeg.ars.endpoint.HttpEndPoint
 import org.scalatra.LifeCycle

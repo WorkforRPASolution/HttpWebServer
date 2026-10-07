@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.example</groupId>
   <artifactId>HttpWebServer</artifactId>
-  <version>3.0.8.1</version>
+  <version>3.0.8.4</version>
   <name>${project.artifactId}</name>
   <description>HttpWebServer</description>
   <inceptionYear>2015</inceptionYear>
