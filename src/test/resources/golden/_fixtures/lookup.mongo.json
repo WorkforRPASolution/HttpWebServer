@@ -1,0 +1,13 @@
+{
+  "POPUP_TEMPLATE_REPOSITORY": [
+    {"process": "PHOTO", "model": "MODEL-A", "code": "RM_CPU", "html": "<div>팝업 RM_CPU</div>", "noSendEmail": true},
+    {"process": "PHOTO", "model": "MODEL-A", "code": "RM_MEM", "html": "<div>팝업 RM_MEM</div>"},
+    {"process": "PHOTO", "model": "MODEL-A", "code": "RM_DUP", "html": "<div>중복 1</div>"},
+    {"process": "PHOTO", "model": "MODEL-A", "code": "RM_DUP", "html": "<div>중복 2</div>"}
+  ],
+  "EMAIL_IMAGE_REPOSITORY": [
+    {"prefix": "ARS_PHOTO_MODEL-A_RM_CPU__", "name": "logo.png", "body": {"$file": "_files/favicon.png"}},
+    {"prefix": "ARS_PHOTO_MODEL-A_RM_CPU__", "name": "dup.png", "body": {"$file": "_files/favicon.png"}},
+    {"prefix": "ARS_PHOTO_MODEL-A_RM_CPU__", "name": "dup.png", "body": {"$file": "_files/favicon.png"}}
+  ]
+}

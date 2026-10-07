@@ -1,0 +1,11 @@
+# case: PopupContentV2/duplicate
+== reply ==
+<0 bytes sha256:e3b0c44298fc>
+== redis ==
+(변경 없음)
+== mongo ==
+(변경 없음)
+== cassandra ==
+(변경 없음)
+== files ==
+(변경 없음)
