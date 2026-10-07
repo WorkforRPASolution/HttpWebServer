@@ -1,0 +1,1 @@
+{"message":"CustomFiles","params":{"eqpid":"EQP001","year":"2026","month":"7","fname":"a'b"},"cassandra":{"customfiles":[{"eqpid":"EQP001","year":2026,"month":7,"fname":"report.txt","body":"0x68656c6c6f"}]},"knownIssue":"KNOWN-ISSUE 2: URL 로 받은 값을 CQL 문자열에 그대로 붙여 쿼리가 깨진다 (주입 위험)"}

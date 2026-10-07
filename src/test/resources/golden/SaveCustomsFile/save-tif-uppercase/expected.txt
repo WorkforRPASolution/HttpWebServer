@@ -1,0 +1,12 @@
+# case: SaveCustomsFile/save-tif-uppercase
+# KNOWN-ISSUE: KNOWN-ISSUE 1: JDK 8 ImageIO 에 TIFF 리더가 없어 변환 결과가 null 이 되고 저장이 실패한다
+== reply ==
+{"result":"Failed","message":null}
+== redis ==
+(변경 없음)
+== mongo ==
+(변경 없음)
+== cassandra ==
+(변경 없음)
+== files ==
+(변경 없음)

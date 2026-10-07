@@ -1,0 +1,11 @@
+# case: SnapShotImage/snapshot-found
+== reply ==
+<286 bytes sha256:99d69510d1da>
+== redis ==
+(변경 없음)
+== mongo ==
+(변경 없음)
+== cassandra ==
+(변경 없음)
+== files ==
+(변경 없음)

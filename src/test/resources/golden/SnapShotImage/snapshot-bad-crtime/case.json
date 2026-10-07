@@ -1,0 +1,1 @@
+{"message":"SnapShotImage","params":{"eqpid":"EQP001","crtime":"abc"},"cassandra":{"emailsnapshot":[{"eqpid":"EQP001","timestamp":1700000000000,"body":{"$file":"_files/favicon.png"}}]},"knownIssue":"KNOWN-ISSUE 2: URL 로 받은 값을 CQL 문자열에 그대로 붙여 쿼리가 깨진다 (주입 위험)"}

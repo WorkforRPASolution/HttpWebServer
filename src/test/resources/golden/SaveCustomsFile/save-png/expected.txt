@@ -1,0 +1,12 @@
+# case: SaveCustomsFile/save-png
+== reply ==
+{"result":"Success","message":""}
+== redis ==
+(변경 없음)
+== mongo ==
+(변경 없음)
+== cassandra ==
+customfiles
+  + {"body":"<286 bytes sha256:99d69510d1da>","eqpid":"EQP001","fname":"photo.png","month":7,"year":2026}
+== files ==
+(변경 없음)

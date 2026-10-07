@@ -1,0 +1,1 @@
+{"message":"QueryHistory","params":{"eqpid":"x' OR eqpid='EQP001","txn":"7"},"knownIssue":"KNOWN-ISSUE 2: URL 로 받은 값을 CQL 문자열에 그대로 붙여 쿼리가 깨진다 (주입 위험)"}

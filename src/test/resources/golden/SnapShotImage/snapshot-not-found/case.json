@@ -1,0 +1,1 @@
+{"message":"SnapShotImage","params":{"eqpid":"EQP001","crtime":"1700000000999"},"cassandra":{"emailsnapshot":[{"eqpid":"EQP001","timestamp":1700000000000,"body":{"$file":"_files/favicon.png"}}]}}

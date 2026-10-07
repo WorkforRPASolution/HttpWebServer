@@ -1,0 +1,1 @@
+{"message":"CustomFiles","params":{"eqpid":"EQP001","year":"2026","month":"7","fname":"other.txt"},"cassandra":{"customfiles":[{"eqpid":"EQP001","year":2026,"month":7,"fname":"report.txt","body":"0x68656c6c6f"}]}}

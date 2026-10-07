@@ -1,0 +1,11 @@
+# case: CustomFiles/customfiles-found
+== reply ==
+<5 bytes sha256:2cf24dba5fb0>
+== redis ==
+(변경 없음)
+== mongo ==
+(변경 없음)
+== cassandra ==
+(변경 없음)
+== files ==
+(변경 없음)

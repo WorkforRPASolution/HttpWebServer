@@ -1,0 +1,11 @@
+# case: SaveCustomsFile/save-null-fname
+== reply ==
+{"result":"Failed","message":"Invalid null value in condition for column fname"}
+== redis ==
+(변경 없음)
+== mongo ==
+(변경 없음)
+== cassandra ==
+(변경 없음)
+== files ==
+(변경 없음)

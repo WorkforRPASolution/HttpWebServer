@@ -1,0 +1,12 @@
+# case: SnapShotImage/snapshot-bad-crtime
+# KNOWN-ISSUE: KNOWN-ISSUE 2: URL 로 받은 값을 CQL 문자열에 그대로 붙여 쿼리가 깨진다 (주입 위험)
+== reply ==
+<0 bytes sha256:e3b0c44298fc>
+== redis ==
+(변경 없음)
+== mongo ==
+(변경 없음)
+== cassandra ==
+(변경 없음)
+== files ==
+(변경 없음)
